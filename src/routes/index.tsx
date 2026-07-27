@@ -40,11 +40,14 @@ function Landing() {
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-xl font-medium tracking-tight">Primeiros Capítulos</span>
-            <span className="text-[10px] uppercase tracking-widest text-gold border border-gold/40 px-2 py-0.5 rounded-full font-sans">
-              Edição Memória
-            </span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/logo.png" alt="Logo Primeiros Capítulos" className="w-9 h-9 rounded-full object-cover border border-gold/40 shadow-sm" />
+            <div className="flex flex-col text-left">
+              <span className="font-display text-xl font-medium tracking-tight leading-none">Primeiros Capítulos</span>
+              <span className="text-[9px] uppercase tracking-widest text-gold font-sans font-semibold mt-1">
+                Livro da Vida do Seu Filho
+              </span>
+            </div>
           </Link>
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
@@ -62,7 +65,7 @@ function Landing() {
 
       {/* Hero Section */}
       <main>
-        <section className="mx-auto max-w-4xl px-6 pt-20 pb-16 text-center sm:pt-28 sm:pb-24">
+        <section className="mx-auto max-w-5xl px-6 pt-16 pb-16 text-center sm:pt-24 sm:pb-24">
           <span className="label-eyebrow animate-[var(--animate-fade)]">Um legado, não apenas um aplicativo</span>
           <h1 className="text-display mt-6 animate-[var(--animate-rise)] text-5xl sm:text-7xl leading-[1.08] text-balance">
             O livro mais importante
@@ -89,17 +92,48 @@ function Landing() {
             </a>
           </div>
 
-          {/* Book Mockup Preview Card */}
-          <div className="mt-16 mx-auto max-w-3xl surface-paper rounded-3xl p-8 sm:p-12 text-left relative overflow-hidden border border-border shadow-book animate-[var(--animate-page)]">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gold-soft/30 rounded-bl-full pointer-events-none" />
-            <span className="label-eyebrow">Exemplo de Página • Capítulo 1</span>
-            <h3 className="mt-3 font-display text-3xl sm:text-4xl">"O dia em que soubemos de você"</h3>
-            <p className="mt-4 font-display text-lg text-muted-foreground italic leading-relaxed">
-              "Era uma manhã quieta de terça-feira quando duas linhas paralelas mudaram nosso mundo para sempre. O teste tremia nas minhas mãos, mas o coração batia com a certeza de que a maior aventura da nossa vida estava apenas começando..."
-            </p>
-            <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
-              <span>Maternidade • 12 de Março, 2026</span>
-              <span className="text-gold font-medium">Página 12</span>
+          {/* New Visual Transformation Showcase (Replaces text chapter example) */}
+          <div className="mt-16 mx-auto surface-paper rounded-3xl p-6 sm:p-10 border border-border shadow-book animate-[var(--animate-page)] relative overflow-hidden">
+            <div className="text-center mb-8">
+              <span className="label-eyebrow text-gold">A Magia do Processo</span>
+              <h3 className="font-display text-3xl mt-1">Do seu celular direto para as páginas da vida dele</h3>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-8 items-center text-left">
+              {/* Left Side: Phone Audio/Text Input Card */}
+              <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-6 relative">
+                <div className="flex items-center justify-between border-b border-border/50 pb-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-xs font-mono text-muted-foreground">Mensagem da Mãe • WhatsApp</span>
+                  </div>
+                  <span className="text-[10px] bg-gold-soft/40 text-gold px-2 py-0.5 rounded-full">30 segundos</span>
+                </div>
+                <p className="text-sm font-sans text-foreground/90 italic leading-relaxed">
+                  "Oi! Hoje o Pedro deu os 3 primeiros passinhos no meio da sala. Ficou rindo e caiu nos meus braços... Chorei de emoção!"
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/30">
+                  <span>🎙️ Áudio gravado</span>
+                  <span>14:32</span>
+                </div>
+              </div>
+
+              {/* Right Side: High End Book Mockup Image */}
+              <div className="relative group">
+                <div className="rounded-2xl overflow-hidden border border-border shadow-lift relative">
+                  <img 
+                    src="/book-mockup.jpg" 
+                    alt="Livro Impresso Primeiros Capítulos" 
+                    className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent flex items-end p-5">
+                    <div>
+                      <span className="text-xs font-display text-gold">Capa Dura Nobre • Impresso</span>
+                      <h4 className="font-display text-xl text-foreground mt-0.5">"Os Três Primeiros Passos"</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
