@@ -34,7 +34,7 @@ function Inicio() {
     () => new Set(moments.map((m) => m.chapter_slug)).size,
     [moments],
   );
-  const progress = Math.min(100, Math.round((chaptersStarted / CHAPTERS.length) * 100));
+  const progress = Math.min(100, Math.round((pages / 30) * 100));
   const recent = [...moments].sort((a, b) => b.happened_on.localeCompare(a.happened_on));
 
   return (
@@ -65,7 +65,7 @@ function Inicio() {
             <p className="font-display text-2xl text-muted-foreground italic">
               {pages === 0
                 ? "0 páginas · Vamos começar a escrever essa história?"
-                : `${pages} páginas criadas · ${chaptersStarted} de ${CHAPTERS.length} capítulos iniciados`}
+                : `${pages} ${pages === 1 ? "página criada" : "páginas criadas"} · ${chaptersStarted} ${chaptersStarted === 1 ? "capítulo ou fase personalizada" : "capítulos ou fases personalizadas"}`}
             </p>
 
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">

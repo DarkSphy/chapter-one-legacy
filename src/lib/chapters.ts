@@ -5,50 +5,28 @@ export type ChapterDef = {
   subtitle: string;
 };
 
-export const CHAPTERS: ChapterDef[] = [
-  {
-    slug: "antes-de-voce",
-    index: 1,
-    title: "Antes de você nascer",
-    subtitle: "O mundo esperando, sem saber o que estava por vir.",
-  },
-  {
-    slug: "esperando-voce",
-    index: 2,
-    title: "Esperando você",
-    subtitle: "Nove meses de contagem, de sonhos e de barriga crescendo.",
-  },
-  {
-    slug: "sua-chegada",
-    index: 3,
-    title: "Sua chegada",
-    subtitle: "O dia em que o tempo parou.",
-  },
-  {
-    slug: "primeiras-descobertas",
-    index: 4,
-    title: "Primeiras descobertas",
-    subtitle: "Tudo era novo, inclusive nós.",
-  },
-  {
-    slug: "primeiros-sorrisos",
-    index: 5,
-    title: "Primeiros sorrisos",
-    subtitle: "E o mundo ficou mais leve.",
-  },
-  {
-    slug: "primeiros-passos",
-    index: 6,
-    title: "Primeiros passos",
-    subtitle: "Pequenos para o mundo. Gigantes para nós.",
-  },
-];
+export const CHAPTERS: ChapterDef[] = [];
+
+const LEGACY_CHAPTERS: Record<string, { title: string; subtitle: string }> = {
+  "antes-de-voce": { title: "Antes de você nascer", subtitle: "O mundo esperando, sem saber o que estava por vir." },
+  "esperando-voce": { title: "Esperando você", subtitle: "Nove meses de contagem, de sonhos e de barriga crescendo." },
+  "sua-chegada": { title: "Sua chegada", subtitle: "O dia em que o tempo parou." },
+  "primeiras-descobertas": { title: "Primeiras descobertas", subtitle: "Tudo era novo, inclusive nós." },
+  "primeiros-sorrisos": { title: "Primeiros sorrisos", subtitle: "E o mundo ficou mais leve." },
+  "primeiros-passos": { title: "Primeiros passos", subtitle: "Pequenos para o mundo. Gigantes para nós." },
+};
 
 export const chapterBySlug = (slug: string, customChapters?: ChapterDef[]) => {
-  const found =
-    customChapters?.find((c) => c.slug === slug) ??
-    CHAPTERS.find((c) => c.slug === slug);
+  const found = customChapters?.find((c) => c.slug === slug);
   if (found) return found;
+  if (LEGACY_CHAPTERS[slug]) {
+    return {
+      slug,
+      index: 99,
+      title: LEGACY_CHAPTERS[slug].title,
+      subtitle: LEGACY_CHAPTERS[slug].subtitle,
+    };
+  }
   // Dynamic fallback for custom chapters not in list
   const formatTitle = slug
     .replace(/-/g, " ")
@@ -56,7 +34,7 @@ export const chapterBySlug = (slug: string, customChapters?: ChapterDef[]) => {
   return {
     slug,
     index: 99,
-    title: formatTitle || "Capítulo Especial",
+    title: formatTitle || "Nossa História",
     subtitle: "Um capítulo especial da nossa história.",
   };
 };
@@ -66,7 +44,6 @@ export function getAllChapters(
   customChapters?: ChapterDef[]
 ): ChapterDef[] {
   const map = new Map<string, ChapterDef>();
-  CHAPTERS.forEach((c) => map.set(c.slug, { ...c }));
   customChapters?.forEach((c) => {
     if (c.title === "__DELETED__") {
       map.delete(c.slug);
@@ -107,15 +84,7 @@ export function getFeeling(value?: string | null) {
   return { value, label: value, emoji: "💛" };
 }
 
-export const CATEGORIES = [
-  { value: "gestacao", label: "Gestação" },
-  { value: "ultrassom", label: "Ultrassom" },
-  { value: "nascimento", label: "Nascimento" },
-  { value: "primeira-vez", label: "Primeira vez" },
-  { value: "familia", label: "Família" },
-  { value: "passeio", label: "Passeio" },
-  { value: "memoria", label: "Memória" },
-];
+export const CATEGORIES: { value: string; label: string }[] = [];
 
 export function getCategoryLabel(value?: string | null) {
   if (!value) return "";

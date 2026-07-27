@@ -12,14 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { CATEGORIES, CHAPTERS, FEELINGS, chapterBySlug, getAllChapters } from "@/lib/chapters";
+import { FEELINGS, getAllChapters } from "@/lib/chapters";
 import { useChild, useCreateMoment, useCustomChapters } from "@/hooks/useLibrary";
 import { uploadFile, upsertCustomChapter } from "@/services/library";
 import { cn } from "@/lib/utils";
@@ -37,11 +30,8 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   const [title, setTitle] = useState("");
   const [raw, setRaw] = useState("");
   
-  const [category, setCategory] = useState("memoria");
-  const [customCategoryName, setCustomCategoryName] = useState("");
-
-  const [chapter, setChapter] = useState(CHAPTERS[0].slug);
-  const [customChapterTitle, setCustomChapterTitle] = useState("");
+  const [categoryName, setCategoryName] = useState("");
+  const [chapterName, setChapterName] = useState("");
 
   const [feeling, setFeeling] = useState<string | null>(null);
   const [isCustomFeeling, setIsCustomFeeling] = useState(false);
@@ -60,10 +50,8 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   function reset() {
     setTitle("");
     setRaw("");
-    setCategory("memoria");
-    setCustomCategoryName("");
-    setChapter(CHAPTERS[0].slug);
-    setCustomChapterTitle("");
+    setCategoryName("");
+    setChapterName("");
     setFeeling(null);
     setIsCustomFeeling(false);
     setCustomFeelingText("");
@@ -84,22 +72,16 @@ export function MomentDialog({ open, onOpenChange }: Props) {
     }
     setSaving(true);
     try {
-      let finalChapterSlug = chapter;
-      if (chapter === "__custom_chapter__") {
-        const titleClean = customChapterTitle.trim() || "Capítulo Especial";
-        finalChapterSlug = titleClean
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "") || `capitulo-${Date.now()}`;
-        await upsertCustomChapter(finalChapterSlug, titleClean);
-      }
+      const titleClean = chapterName.trim() || "Nossa História";
+      const finalChapterSlug = titleClean
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") || `capitulo-${Date.now()}`;
+      await upsertCustomChapter(finalChapterSlug, titleClean);
 
-      const finalCategory =
-        category === "__custom_category__"
-          ? (customCategoryName.trim().toLowerCase().replace(/\s+/g, "-") || "memoria")
-          : category;
+      const finalCategory = categoryName.trim().toLowerCase().replace(/\s+/g, "-") || "memoria";
 
       const finalFeeling = isCustomFeeling
         ? (customFeelingText.trim() || null)
@@ -192,56 +174,48 @@ export function MomentDialog({ open, onOpenChange }: Props) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Capítulo</Label>
-              <Select value={chapter} onValueChange={setChapter}>
-                <SelectTrigger className="rounded-xl bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="capitulo">Capítulo / Época (100% Personalizado)</Label>
+                <button
+                  type="button"
+                  onClick={() => setOpenChapterManager(true)}
+                  className="text-xs text-gold hover:underline font-medium"
+                >
+                  Gerenciar Fases
+                </button>
+              </div>
+              <Input
+                id="capitulo"
+                value={chapterName}
+                onChange={(e) => setChapterName(e.target.value)}
+                placeholder="Ex: Minha Gravidez, O Nascimento, 1º Aniversário..."
+                className="rounded-xl bg-background"
+              />
+              {allChapters.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="text-[11px] text-muted-foreground self-center mr-1">Fases criadas:</span>
                   {allChapters.map((c) => (
-                    <SelectItem key={c.slug} value={c.slug}>
-                      {c.index}. {c.title}
-                    </SelectItem>
+                    <button
+                      key={c.slug}
+                      type="button"
+                      onClick={() => setChapterName(c.title)}
+                      className="rounded-full border border-gold/40 bg-gold-soft/20 px-2.5 py-0.5 text-xs text-foreground hover:bg-gold hover:text-white transition-colors"
+                    >
+                      {c.title}
+                    </button>
                   ))}
-                  <SelectItem value="__custom_chapter__" className="font-medium text-gold">
-                    + Novo capítulo (Personalizar)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              {chapter === "__custom_chapter__" && (
-                <Input
-                  value={customChapterTitle}
-                  onChange={(e) => setCustomChapterTitle(e.target.value)}
-                  placeholder="Título do capítulo (ex: Primeiro Aniversário)"
-                  className="mt-2 rounded-xl border-gold/50 bg-gold-soft/10 text-sm animate-[var(--animate-fade)]"
-                />
+                </div>
               )}
             </div>
             <div className="space-y-2">
-              <Label>Categoria</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="rounded-xl bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>
-                      {c.label}
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="__custom_category__" className="font-medium text-gold">
-                    + Outra categoria (Personalizar)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              {category === "__custom_category__" && (
-                <Input
-                  value={customCategoryName}
-                  onChange={(e) => setCustomCategoryName(e.target.value)}
-                  placeholder="Ex: Mesversário, Batizado, Escola..."
-                  className="mt-2 rounded-xl border-gold/50 bg-gold-soft/10 text-sm animate-[var(--animate-fade)]"
-                />
-              )}
+              <Label htmlFor="categoria">Categoria / Palavra-chave (100% Personalizado)</Label>
+              <Input
+                id="categoria"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="Ex: Mesversário, Ultrassom, Passeio, Família..."
+                className="rounded-xl bg-background"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
