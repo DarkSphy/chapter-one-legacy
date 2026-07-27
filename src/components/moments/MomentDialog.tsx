@@ -13,7 +13,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { FEELINGS, getAllChapters } from "@/lib/chapters";
-import { useChild, useCreateMoment, useCustomChapters } from "@/hooks/useLibrary";
+import {
+  useChild,
+  useCreateMoment,
+  useCustomChapters,
+  useCustomCategories,
+  useCustomFeelings,
+  useUpsertChapter,
+  useUpsertCategory,
+  useUpsertFeeling,
+  useMoments,
+} from "@/hooks/useLibrary";
 import { uploadFile, upsertCustomChapter } from "@/services/library";
 import { cn } from "@/lib/utils";
 import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
@@ -23,6 +33,12 @@ type Props = { open: boolean; onOpenChange: (open: boolean) => void; defaultChap
 export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
   const { data: child } = useChild();
   const { data: dbChapters } = useCustomChapters();
+  const { data: dbCategories } = useCustomCategories();
+  const { data: dbFeelings } = useCustomFeelings();
+  const { data: dbMoments = [] } = useMoments();
+  const upsertChapter = useUpsertChapter();
+  const upsertCategory = useUpsertCategory();
+  const upsertFeeling = useUpsertFeeling();
   const allChapters = getAllChapters(undefined, dbChapters);
   const create = useCreateMoment(child?.id ?? null);
 
@@ -30,8 +46,17 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
   const [title, setTitle] = useState("");
   const [raw, setRaw] = useState("");
   
-  const [categoryName, setCategoryName] = useState("");
+  const [categoryName, setCategoryName] = useState("Geral");
   const [chapterName, setChapterName] = useState("");
+
+  const [isCreatingChapter, setIsCreatingChapter] = useState(false);
+  const [newChapterTitle, setNewChapterTitle] = useState("");
+
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  const [isCreatingFeeling, setIsCreatingFeeling] = useState(false);
+  const [newFeelingLabel, setNewFeelingLabel] = useState("");
 
   useEffect(() => {
     if (open && defaultChapter) {
@@ -40,8 +65,6 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
   }, [open, defaultChapter]);
 
   const [feeling, setFeeling] = useState<string | null>(null);
-  const [isCustomFeeling, setIsCustomFeeling] = useState(false);
-  const [customFeelingText, setCustomFeelingText] = useState("");
 
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [time, setTime] = useState("");
@@ -56,11 +79,9 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
   function reset() {
     setTitle("");
     setRaw("");
-    setCategoryName("");
+    setCategoryName("Geral");
     setChapterName("");
     setFeeling(null);
-    setIsCustomFeeling(false);
-    setCustomFeelingText("");
     setDate(new Date().toISOString().slice(0, 10));
     setTime("");
     setPlace("");
@@ -89,9 +110,7 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
 
       const finalCategory = categoryName.trim().toLowerCase().replace(/\s+/g, "-") || "memoria";
 
-      const finalFeeling = isCustomFeeling
-        ? (customFeelingText.trim() || null)
-        : feeling;
+      const finalFeeling = feeling || null;
 
       const uploaded: { url: string; media_type: "photo" | "video" | "video_link" }[] = [];
       
@@ -181,48 +200,126 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="capitulo">Capítulo / Época (100% Personalizado)</Label>
+                <Label htmlFor="capitulo">Fase / Capítulo</Label>
                 <button
                   type="button"
-                  onClick={() => setOpenChapterManager(true)}
-                  className="text-xs text-gold hover:underline font-medium"
+                  onClick={() => setIsCreatingChapter(!isCreatingChapter)}
+                  className="text-xs text-gold hover:underline font-medium flex items-center gap-1"
                 >
-                  Gerenciar Fases
+                  <Plus className="size-3" />
+                  {isCreatingChapter ? "Cancelar" : "Nova Fase"}
                 </button>
               </div>
-              <Input
-                id="capitulo"
-                value={chapterName}
-                onChange={(e) => setChapterName(e.target.value)}
-                placeholder="Ex: Minha Gravidez, O Nascimento, 1º Aniversário..."
-                className="rounded-xl bg-background"
-              />
-              {allChapters.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="text-[11px] text-muted-foreground self-center mr-1">Fases criadas:</span>
-                  {allChapters.map((c) => (
-                    <button
-                      key={c.slug}
-                      type="button"
-                      onClick={() => setChapterName(c.title)}
-                      className="rounded-full border border-gold/40 bg-gold-soft/20 px-2.5 py-0.5 text-xs text-foreground hover:bg-gold hover:text-white transition-colors"
-                    >
-                      {c.title}
-                    </button>
-                  ))}
+
+              {isCreatingChapter && (
+                <div className="flex gap-2 p-2 rounded-xl bg-secondary/80 border border-gold/40 animate-[var(--animate-fade)]">
+                  <Input
+                    value={newChapterTitle}
+                    onChange={(e) => setNewChapterTitle(e.target.value)}
+                    placeholder="Ex: 1º Aninho, Nascimento..."
+                    className="h-8 text-xs bg-background"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={!newChapterTitle.trim() || upsertChapter.isPending}
+                    onClick={async () => {
+                      const titleClean = newChapterTitle.trim();
+                      const slug = titleClean.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `cap-${Date.now()}`;
+                      await upsertChapter.mutateAsync({ slug, title: titleClean });
+                      setChapterName(titleClean);
+                      setNewChapterTitle("");
+                      setIsCreatingChapter(false);
+                      toast.success("Fase criada!");
+                    }}
+                    className="h-8 px-3 rounded-lg bg-gold text-white text-xs hover:bg-gold/90 shrink-0"
+                  >
+                    {upsertChapter.isPending ? <Loader2 className="size-3 animate-spin" /> : "Criar"}
+                  </Button>
                 </div>
               )}
+
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {allChapters.map((c) => (
+                  <button
+                    key={c.slug}
+                    type="button"
+                    onClick={() => setChapterName(c.title)}
+                    className={cn(
+                      "rounded-full border px-2.5 py-1 text-xs transition-all duration-200",
+                      chapterName === c.title
+                        ? "border-gold bg-gold text-white font-medium shadow-sm"
+                        : "border-border bg-secondary/40 text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                    )}
+                  >
+                    {c.title}
+                  </button>
+                ))}
+              </div>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="categoria">Categoria / Palavra-chave (100% Personalizado)</Label>
-              <Input
-                id="categoria"
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="Ex: Mesversário, Ultrassom, Passeio, Família..."
-                className="rounded-xl bg-background"
-              />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="categoria">Categoria</Label>
+                <button
+                  type="button"
+                  onClick={() => setIsCreatingCategory(!isCreatingCategory)}
+                  className="text-xs text-gold hover:underline font-medium flex items-center gap-1"
+                >
+                  <Plus className="size-3" />
+                  {isCreatingCategory ? "Cancelar" : "Nova Categoria"}
+                </button>
+              </div>
+
+              {isCreatingCategory && (
+                <div className="flex gap-2 p-2 rounded-xl bg-secondary/80 border border-gold/40 animate-[var(--animate-fade)]">
+                  <Input
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Ex: Comemoração, Médico..."
+                    className="h-8 text-xs bg-background"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={!newCategoryName.trim() || upsertCategory.isPending}
+                    onClick={async () => {
+                      const nameClean = newCategoryName.trim();
+                      await upsertCategory.mutateAsync({ name: nameClean });
+                      setCategoryName(nameClean);
+                      setNewCategoryName("");
+                      setIsCreatingCategory(false);
+                      toast.success("Categoria criada!");
+                    }}
+                    className="h-8 px-3 rounded-lg bg-gold text-white text-xs hover:bg-gold/90 shrink-0"
+                  >
+                    {upsertCategory.isPending ? <Loader2 className="size-3 animate-spin" /> : "Criar"}
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {Array.from(new Set([
+                  "Geral", "Maternidade", "Primeira Vez", "Família", "Mesversário", "Ultrassom", "Passeio", "Engraçado",
+                  ...(dbCategories?.map((c) => c.name) || [])
+                ])).map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategoryName(cat)}
+                    className={cn(
+                      "rounded-full border px-2.5 py-1 text-xs transition-all duration-200 capitalize",
+                      categoryName.toLowerCase() === cat.toLowerCase()
+                        ? "border-gold bg-gold text-white font-medium shadow-sm"
+                        : "border-border bg-secondary/40 text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                    )}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="data">Data</Label>
@@ -259,64 +356,108 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label>Sentimento</Label>
-            <div className="flex flex-wrap gap-2 items-center">
-              {FEELINGS.map((f) => (
-                <button
-                  key={f.value}
-                  type="button"
-                  onClick={() => {
-                    setIsCustomFeeling(false);
-                    setFeeling(feeling === f.value ? null : f.value);
-                  }}
-                  className={cn(
-                    "rounded-full border border-border px-3.5 py-1.5 text-sm transition-all duration-200",
-                    !isCustomFeeling && feeling === f.value
-                      ? "border-gold bg-gold-soft/50 text-foreground"
-                      : "text-muted-foreground hover:border-gold/50",
-                  )}
-                >
-                  <span className="mr-1.5">{f.emoji}</span>
-                  {f.label}
-                </button>
-              ))}
+            <div className="flex items-center justify-between">
+              <Label>Sentimento</Label>
               <button
                 type="button"
-                onClick={() => {
-                  setIsCustomFeeling(!isCustomFeeling);
-                  if (!isCustomFeeling) setFeeling(null);
-                }}
-                className={cn(
-                  "rounded-full border border-dashed px-3.5 py-1.5 text-sm transition-all duration-200 flex items-center gap-1",
-                  isCustomFeeling
-                    ? "border-gold bg-gold text-foreground font-medium"
-                    : "border-gold/60 text-gold hover:bg-gold-soft/20",
-                )}
+                onClick={() => setIsCreatingFeeling(!isCreatingFeeling)}
+                className="text-xs text-gold hover:underline font-medium flex items-center gap-1"
               >
-                <Plus className="size-3.5" />
-                Outro sentimento...
+                <Plus className="size-3" />
+                {isCreatingFeeling ? "Cancelar" : "Outro sentimento"}
               </button>
             </div>
-            {isCustomFeeling && (
-              <Input
-                value={customFeelingText}
-                onChange={(e) => setCustomFeelingText(e.target.value)}
-                placeholder="Digite o sentimento (ex: 🙏 Abençoada, 😍 Encantada, 🏖️ Em paz...)"
-                className="mt-2 rounded-xl border-gold/50 bg-gold-soft/10 text-sm animate-[var(--animate-fade)]"
-              />
+
+            {isCreatingFeeling && (
+              <div className="flex gap-2 p-2 rounded-xl bg-secondary/80 border border-gold/40 animate-[var(--animate-fade)]">
+                <Input
+                  value={newFeelingLabel}
+                  onChange={(e) => setNewFeelingLabel(e.target.value)}
+                  placeholder="Ex: Encantada, Grata, Em paz..."
+                  className="h-8 text-xs bg-background"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={!newFeelingLabel.trim() || upsertFeeling.isPending}
+                  onClick={async () => {
+                    const labelClean = newFeelingLabel.trim();
+                    await upsertFeeling.mutateAsync({ label: labelClean, emoji: "" });
+                    setFeeling(labelClean);
+                    setNewFeelingLabel("");
+                    setIsCreatingFeeling(false);
+                    toast.success("Sentimento criado!");
+                  }}
+                  className="h-8 px-3 rounded-lg bg-gold text-white text-xs hover:bg-gold/90 shrink-0"
+                >
+                  {upsertFeeling.isPending ? <Loader2 className="size-3 animate-spin" /> : "Criar"}
+                </Button>
+              </div>
             )}
+
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {Array.from(new Set([
+                ...FEELINGS.map((f) => f.label),
+                ...(dbFeelings?.map((f) => f.label) || [])
+              ])).map((fLabel) => (
+                <button
+                  key={fLabel}
+                  type="button"
+                  onClick={() => setFeeling(feeling === fLabel ? null : fLabel)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs transition-all duration-200",
+                    feeling === fLabel
+                      ? "border-gold bg-gold text-white font-medium shadow-sm"
+                      : "border-border bg-secondary/40 text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                  )}
+                >
+                  {fLabel}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
+            <Label htmlFor="tags">Tags (Palavras-chave)</Label>
             <Input
               id="tags"
               value={tags}
               maxLength={200}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="família, primeira vez, verão"
-              className="rounded-xl bg-background"
+              placeholder="Ex: família, verão, primeiro ano (separe por vírgulas)"
+              className="rounded-xl bg-background text-sm"
             />
+            <div className="flex flex-wrap gap-1 pt-1">
+              <span className="text-[11px] text-muted-foreground self-center mr-1">Sugestões:</span>
+              {Array.from(new Set([
+                "família", "primeira vez", "verão", "amor", "sorriso", "passeio", "casa", "especial",
+                ...(dbMoments.flatMap((m) => m.tags || []))
+              ])).slice(0, 12).map((t) => {
+                const currentList = tags.split(",").map((s) => s.trim()).filter(Boolean);
+                const isSelected = currentList.includes(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => {
+                      if (isSelected) {
+                        setTags(currentList.filter((item) => item !== t).join(", "));
+                      } else {
+                        setTags([...currentList, t].join(", "));
+                      }
+                    }}
+                    className={cn(
+                      "rounded-md border px-2 py-0.5 text-[11px] transition-colors",
+                      isSelected
+                        ? "border-gold/60 bg-gold-soft/30 text-gold font-medium"
+                        : "border-border/60 bg-secondary/30 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {isSelected ? `✓ ${t}` : `+ ${t}`}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="space-y-5 pt-2 border-t border-border/40">
