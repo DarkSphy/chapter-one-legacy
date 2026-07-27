@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedLivroRouteImport } from './routes/_authenticated/livro'
@@ -16,6 +18,16 @@ import { Route as AuthenticatedLinhaDoTempoRouteImport } from './routes/_authent
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedCriancaRouteImport } from './routes/_authenticated/crianca'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -49,6 +61,8 @@ const AuthenticatedCriancaRoute = AuthenticatedCriancaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/crianca': typeof AuthenticatedCriancaRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/linha-do-tempo': typeof AuthenticatedLinhaDoTempoRoute
@@ -56,6 +70,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/crianca': typeof AuthenticatedCriancaRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/linha-do-tempo': typeof AuthenticatedLinhaDoTempoRoute
@@ -65,6 +81,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/crianca': typeof AuthenticatedCriancaRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/linha-do-tempo': typeof AuthenticatedLinhaDoTempoRoute
@@ -72,13 +90,29 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/crianca' | '/inicio' | '/linha-do-tempo' | '/livro'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/crianca'
+    | '/inicio'
+    | '/linha-do-tempo'
+    | '/livro'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/crianca' | '/inicio' | '/linha-do-tempo' | '/livro'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/crianca'
+    | '/inicio'
+    | '/linha-do-tempo'
+    | '/livro'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
     | '/_authenticated/crianca'
     | '/_authenticated/inicio'
     | '/_authenticated/linha-do-tempo'
@@ -88,10 +122,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -157,6 +207,8 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
