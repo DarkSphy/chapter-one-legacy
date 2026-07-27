@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/livro")({
       },
     ],
   }),
-  component: Livro;
+  component: Livro,
 });
 
 function Livro() {
