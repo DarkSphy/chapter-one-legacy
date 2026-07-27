@@ -38,6 +38,7 @@ function Crianca() {
   const [form, setForm] = useState({
     name: "",
     mother_name: "",
+    father_name: "",
     birth_date: "",
     last_period_date: "",
     due_date: "",
@@ -53,6 +54,7 @@ function Crianca() {
       setForm({
         name: child.name ?? "",
         mother_name: child.mother_name ?? "",
+        father_name: child.father_name ?? "",
         birth_date: child.birth_date ? child.birth_date.slice(0, 10) : "",
         last_period_date: child.last_period_date ? child.last_period_date.slice(0, 10) : "",
         due_date: child.due_date ? child.due_date.slice(0, 10) : "",
@@ -71,6 +73,7 @@ function Crianca() {
         id: child?.id,
         name: form.name.trim() || null,
         mother_name: form.mother_name.trim() || null,
+        father_name: form.father_name.trim() || null,
         birth_date: form.birth_date || null,
         last_period_date: form.last_period_date || null,
         due_date: form.due_date || null,
@@ -99,7 +102,7 @@ function Crianca() {
       <header className="space-y-3 text-center sm:text-left">
         <p className="label-eyebrow">Configurações & Memórias</p>
         <h1 className="text-display text-4xl sm:text-5xl">
-          {form.mother_name ? `Mãe: ${form.mother_name}` : "Perfil da Mãe e do Bebê"}
+          {form.name ? `Família de ${form.name}` : "Perfil da Família (Mãe, Pai e Bebê)"}
         </h1>
         <p className="text-muted-foreground">
           Acompanhe o tempo de gestação em dias e semanas, datas marcantes e detalhes do livro.
@@ -107,13 +110,13 @@ function Crianca() {
       </header>
 
       {/* Real-time Gestation or Age Dashboard Widget */}
-      <BabyProgressWidget child={{ ...child, ...form, birth_weight_grams: form.birth_weight_grams ? parseInt(form.birth_weight_grams, 10) : null, birth_height_cm: form.birth_height_cm ? parseFloat(form.birth_height_cm) : null } as any} />
+      <BabyProgressWidget child={{ ...child, ...form, birth_weight_grams: form.birth_weight_grams ? parseInt(form.birth_weight_grams, 10) : null, birth_height_cm: form.birth_height_cm ? parseFloat(form.birth_height_cm) : null } as any} hideSettingsButton />
 
       {/* Main Registration Form */}
-      <section className="surface-paper space-y-6 rounded-3xl p-7 sm:p-9 border border-border">
-        <h3 className="font-display text-2xl font-light border-b border-border/50 pb-3">Informações da Mãe & Bebê</h3>
+      <section id="form-perfil" className="surface-paper space-y-6 rounded-3xl p-7 sm:p-9 border border-border">
+        <h3 className="font-display text-2xl font-light border-b border-border/50 pb-3">Informações da Família (Mãe, Pai e Bebê)</h3>
         
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="nomeMae">Nome da Mãe</Label>
             <Input
@@ -121,19 +124,31 @@ function Crianca() {
               value={form.mother_name}
               maxLength={80}
               onChange={(e) => setForm({ ...form, mother_name: e.target.value })}
-              placeholder="Ex: Mariana Silva"
+              placeholder="Ex: Mariana"
               className="rounded-xl bg-background"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="nomeBebe">Nome do Bebê / Criança</Label>
+            <Label htmlFor="nomePai">Nome do Pai</Label>
+            <Input
+              id="nomePai"
+              value={form.father_name}
+              maxLength={80}
+              onChange={(e) => setForm({ ...form, father_name: e.target.value })}
+              placeholder="Ex: Rafael"
+              className="rounded-xl bg-background"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="nomeBebe">Nome do Bebê</Label>
             <Input
               id="nomeBebe"
               value={form.name}
               maxLength={80}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="Ex: Miguel ou Bebê na Barriga"
+              placeholder="Ex: Miguel"
               className="rounded-xl bg-background"
             />
           </div>

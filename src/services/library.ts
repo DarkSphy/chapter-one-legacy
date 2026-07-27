@@ -96,6 +96,7 @@ export async function createMoment(values: MomentInput, childId: string | null):
     .select()
     .single();
   if (error) throw error;
+  if (!moment) throw new Error("Erro ao criar momento.");
 
   if (media && media.length > 0) {
     const mediaRows = media.map((m, idx) => ({
@@ -124,12 +125,13 @@ export async function deleteMoment(id: string) {
   if (error) throw error;
 }
 
-export async function uploadFile(file: File, path: string): Promise<string> {
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+export async function uploadFile(file: File, path?: string): Promise<string> {
+  const finalPath = path || ('moments/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.-]/g, "_"));
+  const { error } = await supabase.storage.from(BUCKET).upload(finalPath, file, {
     upsert: true,
   });
   if (error) throw error;
-  return path;
+  return finalPath;
 }
 
 export async function uploadCoverImage(childId: string, file: File): Promise<string> {
@@ -291,22 +293,22 @@ export async function fetchCustomFeelings(): Promise<FeelingDef[]> {
   } catch (err) {}
   const local = localStorage.getItem("custom_feelings");
   return local ? JSON.parse(local) : [
-    { label: "Amor infinito", emoji: "💖" },
-    { label: "Paz e gratidão", emoji: "🕊️" },
-    { label: "Muita emoção", emoji: "😭" },
-    { label: "Encantada", emoji: "😍" },
-    { label: "Abençoada", emoji: "🙏" },
+    { label: "Amor infinito", emoji: "" },
+    { label: "Paz e gratidão", emoji: "" },
+    { label: "Muita emoção", emoji: "" },
+    { label: "Encantada", emoji: "" },
+    { label: "Abençoada", emoji: "" },
   ];
 }
 
 export async function upsertCustomFeeling(label: string, emoji: string, oldLabel?: string) {
   const local = localStorage.getItem("custom_feelings");
   let list: FeelingDef[] = local ? JSON.parse(local) : [
-    { label: "Amor infinito", emoji: "💖" },
-    { label: "Paz e gratidão", emoji: "🕊️" },
-    { label: "Muita emoção", emoji: "😭" },
-    { label: "Encantada", emoji: "😍" },
-    { label: "Abençoada", emoji: "🙏" },
+    { label: "Amor infinito", emoji: "" },
+    { label: "Paz e gratidão", emoji: "" },
+    { label: "Muita emoção", emoji: "" },
+    { label: "Encantada", emoji: "" },
+    { label: "Abençoada", emoji: "" },
   ];
   if (oldLabel) {
     list = list.map((item) => (item.label === oldLabel ? { label, emoji } : item));

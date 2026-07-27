@@ -54,12 +54,13 @@ export function getAgeDetails(birthDate: string | null) {
   };
 }
 
-export function BabyProgressWidget({ child }: { child: Child | null | undefined }) {
+export function BabyProgressWidget({ child, hideSettingsButton = false }: { child: Child | null | undefined; hideSettingsButton?: boolean }) {
   if (!child) return null;
 
   if (!child.is_born) {
     const gestation = getGestationDetails(child.last_period_date || null, child.due_date || null);
     if (!gestation) {
+      if (hideSettingsButton) return null;
       return (
         <section className="surface-paper overflow-hidden rounded-3xl p-6 sm:p-8 border border-border shadow-lift my-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -96,12 +97,14 @@ export function BabyProgressWidget({ child }: { child: Child | null | undefined 
               <span className="text-sm text-muted-foreground">Acompanhamento em tempo real</span>
             </div>
           </div>
-          <Link to="/crianca" className="shrink-0 self-start sm:self-auto">
-            <Button variant="ghost" className="rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 h-8 px-4">
-              <Settings2 className="size-3.5 mr-1.5" />
-              Editar datas
-            </Button>
-          </Link>
+          {!hideSettingsButton && (
+            <Link to="/crianca" className="shrink-0 self-start sm:self-auto">
+              <Button variant="ghost" className="rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 h-8 px-4">
+                <Settings2 className="size-3.5 mr-1.5" />
+                Editar datas
+              </Button>
+            </Link>
+          )}
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 md:items-center">
@@ -144,6 +147,7 @@ export function BabyProgressWidget({ child }: { child: Child | null | undefined 
   // Born
   const age = getAgeDetails(child.birth_date || null);
   if (!age) {
+    if (hideSettingsButton) return null;
     return (
       <section className="surface-paper overflow-hidden rounded-3xl p-6 sm:p-8 border border-border shadow-lift my-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -180,12 +184,14 @@ export function BabyProgressWidget({ child }: { child: Child | null | undefined 
             <span className="text-sm text-muted-foreground">Contagem e memórias ativas</span>
           </div>
         </div>
-        <Link to="/crianca" className="shrink-0 self-start sm:self-auto">
-          <Button variant="ghost" className="rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 h-8 px-4">
-            <Settings2 className="size-3.5 mr-1.5" />
-            Editar perfil e dados
-          </Button>
-        </Link>
+        {!hideSettingsButton && (
+          <Link to="/crianca" className="shrink-0 self-start sm:self-auto">
+            <Button variant="ghost" className="rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 h-8 px-4">
+              <Settings2 className="size-3.5 mr-1.5" />
+              Editar perfil e dados
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">

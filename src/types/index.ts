@@ -3,6 +3,7 @@ export type Child = {
   user_id: string;
   name: string;
   mother_name?: string | null;
+  father_name?: string | null;
   photo_url: string | null;
   is_born: boolean;
   birth_date: string | null;
