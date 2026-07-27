@@ -1,7 +1,9 @@
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowUpRight, Image as ImageIcon } from "lucide-react";
-import { useSignedUrl } from "@/hooks/useLibrary";
+import { ArrowUpRight, Image as ImageIcon, Trash2, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useSignedUrl, useDeleteMoment } from "@/hooks/useLibrary";
 import { FEELINGS, chapterBySlug } from "@/lib/chapters";
 import type { Moment } from "@/types";
 
@@ -28,10 +30,39 @@ export function MomentCover({
 export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => void }) {
   const feeling = FEELINGS.find((f) => f.value === moment.feeling);
   const chapter = chapterBySlug(moment.chapter_slug);
+  const deleteMoment = useDeleteMoment();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!confirm(`Tem certeza que deseja excluir "${moment.title}" do livro?`)) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      await deleteMoment.mutateAsync(moment.id);
+      toast.success("Momento removido com sucesso.");
+    } catch (error) {
+      toast.error("Não foi possível excluir o momento.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
-    <article className="group surface-paper overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]">
+    <article className="group surface-paper overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] relative">
       <MomentCover path={moment.cover_url} className="h-56 w-full sm:h-64" />
+      
+      {/* Delete Moment Button */}
+      <button
+        onClick={handleDelete}
+        disabled={isDeleting}
+        title="Excluir este momento"
+        className="absolute top-3 right-3 z-10 flex size-9 items-center justify-center rounded-full bg-background/80 text-muted-foreground backdrop-blur-md transition-all duration-200 hover:bg-destructive hover:text-destructive-foreground opacity-80 group-hover:opacity-100 shadow-sm"
+      >
+        {isDeleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+      </button>
+
       <div className="space-y-3 p-6">
         <div className="flex items-center gap-2 text-xs tracking-[0.18em] text-muted-foreground uppercase">
           <span>{format(parseISO(moment.happened_on), "d 'de' MMMM, yyyy", { locale: ptBR })}</span>
@@ -59,3 +90,4 @@ export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => 
     </article>
   );
 }
+
