@@ -2,9 +2,11 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MomentCover } from "@/components/moments/MomentCard";
 import { getFeeling, chapterBySlug, getCategoryLabel } from "@/lib/chapters";
+import { useCustomChapters } from "@/hooks/useLibrary";
 import type { Moment } from "@/types";
 
 export function Timeline({ moments }: { moments: Moment[] }) {
+  const { data: dbChapters } = useCustomChapters();
   if (moments.length === 0) {
     return (
       <div className="surface-paper rounded-3xl p-12 text-center">
@@ -20,7 +22,7 @@ export function Timeline({ moments }: { moments: Moment[] }) {
       {moments.map((moment, idx) => {
         const left = idx % 2 === 0;
         const feeling = getFeeling(moment.feeling);
-        const chapter = chapterBySlug(moment.chapter_slug);
+        const chapter = chapterBySlug(moment.chapter_slug, dbChapters);
 
         return (
           <li key={moment.id} className="relative pl-8 sm:pl-0">

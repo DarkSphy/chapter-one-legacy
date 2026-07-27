@@ -174,6 +174,16 @@ export function ChapterManagerDialog({ open, onOpenChange }: Props) {
                       <p className="text-xs text-muted-foreground italic truncate">
                         {chapter.subtitle}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onOpenChange(false);
+                          window.dispatchEvent(new CustomEvent("open-moment-dialog", { detail: { chapter: chapter.title } }));
+                        }}
+                        className="inline-flex items-center gap-1 text-[11px] text-gold hover:underline font-medium mt-1.5"
+                      >
+                        <Plus className="size-3" /> Adicionar página nesta fase
+                      </button>
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0">

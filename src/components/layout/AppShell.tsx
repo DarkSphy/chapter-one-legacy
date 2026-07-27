@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, LogOut, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MomentDialog } from "@/components/moments/MomentDialog";
@@ -15,9 +15,19 @@ const NAV = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [defaultChapter, setDefaultChapter] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    const handleOpen = (e: any) => {
+      setDefaultChapter(e.detail?.chapter);
+      setOpen(true);
+    };
+    window.addEventListener("open-moment-dialog", handleOpen);
+    return () => window.removeEventListener("open-moment-dialog", handleOpen);
+  }, []);
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -87,14 +97,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main>{children}</main>
 
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setDefaultChapter(undefined);
+          setOpen(true);
+        }}
         className="fixed right-5 bottom-6 z-40 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-[var(--shadow-lift)] transition-transform duration-300 hover:-translate-y-0.5 sm:right-8 sm:bottom-8"
       >
         <Plus className="size-4" strokeWidth={1.75} />
         Escrever uma página
       </button>
 
-      <MomentDialog open={open} onOpenChange={setOpen} />
+      <MomentDialog open={open} onOpenChange={setOpen} defaultChapter={defaultChapter} />
     </div>
   );
 }

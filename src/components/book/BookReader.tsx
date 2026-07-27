@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Video, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Video, ExternalLink, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { MomentCover } from "@/components/moments/MomentCard";
@@ -192,6 +192,14 @@ function PageFace({ page, number }: { page: Page; number: number }) {
           <h2 className="text-display text-4xl sm:text-5xl">{page.title}</h2>
           <div className="gold-rule mx-auto h-px w-16" />
           <p className="font-display text-lg text-muted-foreground italic">{page.subtitle}</p>
+          <div className="pt-6">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("open-moment-dialog", { detail: { chapter: page.title } }))}
+              className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold-soft/20 px-5 py-2.5 text-xs font-medium text-gold hover:bg-gold hover:text-white transition-all duration-300 shadow-sm"
+            >
+              <Plus className="size-3.5" /> Adicionar nova página nesta fase
+            </button>
+          </div>
         </div>
       )}
 

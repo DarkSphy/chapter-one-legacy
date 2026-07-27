@@ -18,7 +18,12 @@ const LEGACY_CHAPTERS: Record<string, { title: string; subtitle: string }> = {
 
 export const chapterBySlug = (slug: string, customChapters?: ChapterDef[]) => {
   const found = customChapters?.find((c) => c.slug === slug);
-  if (found) return found;
+  if (found) {
+    return {
+      ...found,
+      title: found.title.replace(/^\d+\.\s*/, ""),
+    };
+  }
   if (LEGACY_CHAPTERS[slug]) {
     return {
       slug,
@@ -30,7 +35,8 @@ export const chapterBySlug = (slug: string, customChapters?: ChapterDef[]) => {
   // Dynamic fallback for custom chapters not in list
   const formatTitle = slug
     .replace(/-/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
+    .replace(/\b\w/g, (l) => l.toUpperCase())
+    .replace(/^\d+\.\s*/, "");
   return {
     slug,
     index: 99,
@@ -48,7 +54,10 @@ export function getAllChapters(
     if (c.title === "__DELETED__") {
       map.delete(c.slug);
     } else {
-      map.set(c.slug, c);
+      map.set(c.slug, {
+        ...c,
+        title: c.title.replace(/^\d+\.\s*/, ""),
+      });
     }
   });
 
@@ -65,6 +74,10 @@ export function getAllChapters(
 
   return Array.from(map.values())
     .filter((c) => c.title !== "__DELETED__")
+    .map((c) => ({
+      ...c,
+      title: c.title.replace(/^\d+\.\s*/, ""),
+    }))
     .sort((a, b) => a.index - b.index);
 }
 

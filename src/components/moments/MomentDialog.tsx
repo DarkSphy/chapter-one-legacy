@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2, ImagePlus, X, Video, Link2, Plus } from "lucide-react";
 import {
@@ -18,9 +18,9 @@ import { uploadFile, upsertCustomChapter } from "@/services/library";
 import { cn } from "@/lib/utils";
 import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
 
-type Props = { open: boolean; onOpenChange: (open: boolean) => void };
+type Props = { open: boolean; onOpenChange: (open: boolean) => void; defaultChapter?: string };
 
-export function MomentDialog({ open, onOpenChange }: Props) {
+export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
   const { data: child } = useChild();
   const { data: dbChapters } = useCustomChapters();
   const allChapters = getAllChapters(undefined, dbChapters);
@@ -32,6 +32,12 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   
   const [categoryName, setCategoryName] = useState("");
   const [chapterName, setChapterName] = useState("");
+
+  useEffect(() => {
+    if (open && defaultChapter) {
+      setChapterName(defaultChapter);
+    }
+  }, [open, defaultChapter]);
 
   const [feeling, setFeeling] = useState<string | null>(null);
   const [isCustomFeeling, setIsCustomFeeling] = useState(false);

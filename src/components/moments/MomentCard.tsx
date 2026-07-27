@@ -3,7 +3,7 @@ import { ptBR } from "date-fns/locale";
 import { ArrowUpRight, Image as ImageIcon, Trash2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useSignedUrl, useDeleteMoment } from "@/hooks/useLibrary";
+import { useSignedUrl, useDeleteMoment, useCustomChapters } from "@/hooks/useLibrary";
 import { getFeeling, chapterBySlug, getCategoryLabel } from "@/lib/chapters";
 import type { Moment } from "@/types";
 
@@ -18,9 +18,9 @@ export function MomentCover({
   if (!url) {
     return (
       <div
-        className={`flex items-center justify-center bg-gradient-to-br from-secondary to-gold-soft/40 ${className}`}
+        className={`flex items-center justify-center bg-secondary/80 text-muted-foreground ${className}`}
       >
-        <ImageIcon className="size-5 text-muted-foreground/50" strokeWidth={1.25} />
+        <ImageIcon className="size-8 opacity-30" strokeWidth={1} />
       </div>
     );
   }
@@ -29,7 +29,8 @@ export function MomentCover({
 
 export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => void }) {
   const feeling = getFeeling(moment.feeling);
-  const chapter = chapterBySlug(moment.chapter_slug);
+  const { data: dbChapters } = useCustomChapters();
+  const chapter = chapterBySlug(moment.chapter_slug, dbChapters);
   const deleteMoment = useDeleteMoment();
   const [isDeleting, setIsDeleting] = useState(false);
 

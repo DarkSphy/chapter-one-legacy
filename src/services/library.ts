@@ -127,7 +127,7 @@ export async function fetchCustomChapters() {
     .map((row, idx) => ({
       slug: row.slug,
       index: row.position || 10 + idx,
-      title: row.title,
+      title: row.title.replace(/^\d+\.\s*/, ""),
       subtitle: row.subtitle || "Um capítulo especial da nossa história.",
     }));
 }
