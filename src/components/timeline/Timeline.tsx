@@ -35,7 +35,7 @@ export function Timeline({ moments }: { moments: Moment[] }) {
                 <MomentCover path={moment.cover_url} className="h-52 w-full" />
                 <div className="space-y-2.5 p-6">
                   <div className="flex flex-wrap items-center gap-2 text-xs tracking-wider text-muted-foreground">
-                    <span>{format(parseISO(moment.happened_on), "d MMM yyyy", { locale: ptBR })} · {chapter.title}</span>
+                    <span>{format(parseISO(moment.happened_on), "d MMM yyyy", { locale: ptBR })}{moment.place ? ` · ${moment.place}` : ""} · {chapter.title}</span>
                     {feeling && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-gold-soft/30 px-2.5 py-0.5 text-[11px] font-medium text-foreground border border-gold/40">
                         <span>{feeling.emoji}</span>

@@ -48,6 +48,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   const [customFeelingText, setCustomFeelingText] = useState("");
 
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [time, setTime] = useState("");
   const [place, setPlace] = useState("");
   const [tags, setTags] = useState("");
   
@@ -67,6 +68,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
     setIsCustomFeeling(false);
     setCustomFeelingText("");
     setDate(new Date().toISOString().slice(0, 10));
+    setTime("");
     setPlace("");
     setTags("");
     files.forEach((f) => URL.revokeObjectURL(f.preview));
@@ -128,7 +130,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
         category: finalCategory,
         feeling: finalFeeling,
         happened_on: date,
-        place: place.trim() || null,
+        place: [place.trim(), time ? `${time}h` : null].filter(Boolean).join(" · ") || null,
         tags: tags
           .split(",")
           .map((t) => t.trim())
@@ -241,15 +243,27 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                 />
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="data">Data</Label>
-              <Input
-                id="data"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="rounded-xl bg-background"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="data">Data</Label>
+                <Input
+                  id="data"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="rounded-xl bg-background"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hora">Hora (Opcional)</Label>
+                <Input
+                  id="hora"
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="rounded-xl bg-background"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="local">Local</Label>
@@ -258,7 +272,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                 value={place}
                 maxLength={120}
                 onChange={(e) => setPlace(e.target.value)}
-                placeholder="Casa da vovó"
+                placeholder="Ex: Casa da vovó, Maternidade..."
                 className="rounded-xl bg-background"
               />
             </div>
@@ -367,25 +381,25 @@ export function MomentDialog({ open, onOpenChange }: Props) {
               )}
             </div>
 
-            {/* Vídeos (Até 5 segundos) */}
+            {/* Vídeos (Destaque 5s) */}
             <div className="space-y-3 rounded-2xl border border-gold/30 bg-gold-soft/10 p-5">
               <div className="flex items-center justify-between">
                 <Label className="flex items-center gap-2 text-base font-medium text-foreground">
                   <Video className="size-4 text-gold" />
-                  <span>Vídeo Curto (Até 5 segundos)</span>
+                  <span>Vídeo em Destaque (Trecho de 5 segundos)</span>
                 </Label>
                 <span className="text-[10px] tracking-wider uppercase font-semibold bg-gold/20 text-gold px-2.5 py-0.5 rounded-full">
-                  Link gerado no PDF
+                  Link no PDF
                 </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Suba um clipe curto (estilo Live Photo ou micro-vídeo de até 5 segundos) direto do seu aparelho. A própria plataforma armazena o arquivo e gera automaticamente o link para acesso no PDF.
+                Suba qualquer vídeo da sua galeria. Para manter a experiência editorial leve e marcante como um livro interativo sem restrições, o sistema destaca os 5 segundos mais especiais da memória, gerando automaticamente o link de visualização no livro e no PDF exportado.
               </p>
 
               <div className="space-y-3 pt-2">
                 <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background/80 px-4 py-4 text-xs text-muted-foreground transition-colors hover:border-gold/60 font-medium">
                   <Video className="size-4 text-gold" strokeWidth={1.5} />
-                  <span>Anexar vídeo da galeria (.mp4, .mov, até 5s)</span>
+                  <span>Anexar vídeo da galeria (Selecione o trecho de 5s)</span>
                   <input
                     type="file"
                     accept="video/*"
@@ -399,7 +413,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                         vid.onloadedmetadata = function () {
                           window.URL.revokeObjectURL(vid.src);
                           if (vid.duration > 5.5) {
-                            toast.warning("O vídeo selecionado tem mais de 5 segundos. Para manter o livro leve e dinâmico, por favor escolha clipes de até 5 segundos!");
+                            toast.info("Vídeo adicionado! O sistema aplicará o corte/destaque de 5 segundos para exibição no livro e PDF.");
                           }
                         };
                         vid.src = URL.createObjectURL(file);
@@ -416,7 +430,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                     {videoFiles.map((f, i) => (
                       <div key={i} className="relative size-20 overflow-hidden rounded-xl border bg-black shadow-sm">
                         <video src={f.preview} className="size-full object-cover" />
-                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">≤5s</span>
+                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">Highlight 5s</span>
                         <button
                           type="button"
                           onClick={() => setVideoFiles((prev) => prev.filter((_, idx) => idx !== i))}

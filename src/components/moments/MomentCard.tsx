@@ -71,7 +71,7 @@ export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => 
 
       <div className="space-y-3 p-6">
         <div className="flex flex-wrap items-center gap-2 text-xs tracking-wider text-muted-foreground">
-          <span>{format(parseISO(moment.happened_on), "d 'de' MMMM, yyyy", { locale: ptBR })}</span>
+          <span>{format(parseISO(moment.happened_on), "d 'de' MMMM, yyyy", { locale: ptBR })}{moment.place ? ` · ${moment.place}` : ""}</span>
           {feeling && (
             <span className="inline-flex items-center gap-1 rounded-full bg-gold-soft/30 px-2.5 py-0.5 text-[11px] font-medium text-foreground border border-gold/40">
               <span>{feeling.emoji}</span>
