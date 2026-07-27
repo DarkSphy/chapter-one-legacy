@@ -46,7 +46,7 @@ function Livro() {
             className="rounded-full border-gold/50 bg-gold-soft/10 text-gold hover:bg-gold-soft/20 text-xs px-5 shadow-xs transition-all duration-300 hover:scale-105"
           >
             <Settings2 className="size-3.5 mr-1.5" />
-            Personalizar e Organizar Épocas do Livro
+            Personalizar Capítulos, Categorias e Sentimentos
           </Button>
         </div>
       </header>

@@ -385,23 +385,27 @@ export function MomentDialog({ open, onOpenChange, defaultChapter }: Props) {
                     accept="video/*"
                     multiple
                     className="hidden"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const list = Array.from(e.target.files ?? []);
-                      for (const file of list) {
-                        const vid = document.createElement("video");
-                        vid.preload = "metadata";
-                        vid.onloadedmetadata = function () {
-                          window.URL.revokeObjectURL(vid.src);
-                          if (vid.duration > 5.5) {
-                            toast.info("Vídeo adicionado! O sistema aplicará o corte/destaque de 5 segundos para exibição no livro e PDF.");
+                      const validFiles = await Promise.all(
+                        list.map(async (file) => {
+                          const url = URL.createObjectURL(file);
+                          const video = document.createElement('video');
+                          video.preload = 'metadata';
+                          video.src = url;
+                          await new Promise((resolve) => {
+                            video.onloadedmetadata = () => resolve(null);
+                          });
+                          const duration = video.duration;
+                          URL.revokeObjectURL(url);
+                          if (duration > 5) {
+                            toast.error('O vídeo deve ter no máximo 5 segundos.');
+                            return null;
                           }
-                        };
-                        vid.src = URL.createObjectURL(file);
-                      }
-                      setVideoFiles((prev) => [
-                        ...prev,
-                        ...list.map((file) => ({ file, preview: URL.createObjectURL(file) })),
-                      ]);
+                          return { file, preview: url };
+                        })
+                      );
+                      setVideoFiles((prev) => [...prev, ...validFiles.filter(Boolean)]);
                     }}
                   />
                 </label>

@@ -7,10 +7,16 @@ import {
   deleteMoment,
   updateMomentStory,
   upsertChild,
-  signUrl,
+  getSignedUrl as signUrl,
   fetchCustomChapters,
   upsertCustomChapter,
   deleteCustomChapter,
+  fetchCustomCategories,
+  upsertCustomCategory,
+  deleteCustomCategory,
+  fetchCustomFeelings,
+  upsertCustomFeeling,
+  deleteCustomFeeling,
 } from "@/services/library";
 import type { Child, MomentInput } from "@/types";
 
@@ -42,6 +48,46 @@ export function useDeleteChapter() {
       qc.invalidateQueries({ queryKey: ["chapters"] });
       qc.invalidateQueries({ queryKey: ["moments"] });
     },
+  });
+}
+
+export function useCustomCategories() {
+  return useQuery({ queryKey: ["categories"], queryFn: fetchCustomCategories });
+}
+
+export function useUpsertCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ name, oldName }: { name: string; oldName?: string }) => upsertCustomCategory(name, oldName),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["categories"] }),
+  });
+}
+
+export function useDeleteCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => deleteCustomCategory(name),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["categories"] }),
+  });
+}
+
+export function useCustomFeelings() {
+  return useQuery({ queryKey: ["feelings"], queryFn: fetchCustomFeelings });
+}
+
+export function useUpsertFeeling() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ label, emoji, oldLabel }: { label: string; emoji: string; oldLabel?: string }) => upsertCustomFeeling(label, emoji, oldLabel),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feelings"] }),
+  });
+}
+
+export function useDeleteFeeling() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (label: string) => deleteCustomFeeling(label),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feelings"] }),
   });
 }
 
