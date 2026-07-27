@@ -130,7 +130,7 @@ export async function uploadFile(file: File, path: string): Promise<string> {
   });
   if (error) throw error;
   return path;
-}
+}\n\nexport async function uploadCoverImage(childId: string, file: File): Promise<string> {\n  const path = `cover/${childId}/${file.name}`;\n  await uploadFile(file, path);\n  return path;\n}
 
 export async function getSignedUrl(path: string | null | undefined): Promise<string | null> {
   if (!path) return null;
@@ -338,5 +338,27 @@ export async function deleteCustomFeeling(label: string) {
     await supabase.from("feelings" as any).delete().eq("user_id", userId).eq("label", label);
   } catch (err) {
     console.error("Failed to delete feeling from Supabase:", err);
+  }
+}
+export async function fetchCoverSettings(childId: string): Promise<{ font: string; background_color: string; background_image_path: string | null } | null> {
+  const { data, error } = await supabase
+    .from('cover_settings')
+    .select('font, background_color, background_image_path')
+    .eq('child_id', childId)
+    .maybeSingle();
+  if (error) {
+    console.warn('Failed to fetch cover settings:', error);
+    return null;
+  }
+  return data as any;
+}
+
+export async function upsertCoverSettings(childId: string, values: { font?: string; background_color?: string; background_image_path?: string | null }): Promise<void> {
+  const { error } = await supabase
+    .from('cover_settings')
+    .upsert({ child_id: childId, ...values }, { onConflict: 'child_id' });
+  if (error) {
+    console.error('Failed to upsert cover settings:', error);
+    throw error;
   }
 }

@@ -17,6 +17,13 @@ export type Child = {
   updated_at: string;
 };
 
+export type CoverSettings = {
+  child_id: string;
+  font: string;
+  background_color: string;
+  background_image_path: string | null;
+};
+
 export type MomentMedia = {
   id: string;
   moment_id: string;

@@ -24,6 +24,10 @@ export function useChild() {
   return useQuery({ queryKey: ["child"], queryFn: fetchChild });
 }
 
+export function useCoverSettings(childId: string) {
+  return useQuery({ queryKey: ["coverSettings", childId], queryFn: () => fetchCoverSettings(childId) });
+}
+
 export function useCustomChapters() {
   return useQuery({ queryKey: ["chapters"], queryFn: fetchCustomChapters });
 }
