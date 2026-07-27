@@ -50,7 +50,7 @@ export function BookSpread({ pages, currentIndex, onNavigate, onNewPage }: Props
           </span>
           <span className="text-gold">•</span>
           <span className="font-display italic text-sm text-foreground/80">
-            {currentPage?.chapter_slug ? `Capítulo: ${currentPage.chapter_slug.replace/-/g, " "}` : "Memória Eterna"}
+            {currentPage?.chapter_slug ? `Capítulo: ${currentPage.chapter_slug.replace(/-/g, " ")}` : "Memória Eterna"}
           </span>
         </div>
 
