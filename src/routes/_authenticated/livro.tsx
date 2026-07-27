@@ -4,7 +4,7 @@ import { BookReader, buildPages } from "@/components/book/BookReader";
 import { useChild, useMoments, useCustomChapters } from "@/hooks/useLibrary";
 import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Settings2 } from "lucide-react";
+import { Settings2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/livro")({
   head: () => ({

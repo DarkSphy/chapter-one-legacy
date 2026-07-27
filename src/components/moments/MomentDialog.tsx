@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Sparkles, ImagePlus, X, Video, Link2, Plus } from "lucide-react";
-import { useServerFn } from "@tanstack/react-start";
+import { Loader2, ImagePlus, X, Video, Link2, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,6 @@ import {
 import { CATEGORIES, CHAPTERS, FEELINGS, chapterBySlug, getAllChapters } from "@/lib/chapters";
 import { useChild, useCreateMoment, useCustomChapters } from "@/hooks/useLibrary";
 import { uploadFile, upsertCustomChapter } from "@/services/library";
-import { writeStory } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
 
@@ -34,12 +32,10 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   const { data: dbChapters } = useCustomChapters();
   const allChapters = getAllChapters(undefined, dbChapters);
   const create = useCreateMoment(child?.id ?? null);
-  const generate = useServerFn(writeStory);
 
   const [openChapterManager, setOpenChapterManager] = useState(false);
   const [title, setTitle] = useState("");
   const [raw, setRaw] = useState("");
-  const [story, setStory] = useState("");
   
   const [category, setCategory] = useState("memoria");
   const [customCategoryName, setCustomCategoryName] = useState("");
@@ -58,13 +54,11 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   const [files, setFiles] = useState<{ file: File; preview: string }[]>([]);
   const [videoFiles, setVideoFiles] = useState<{ file: File; preview: string }[]>([]);
 
-  const [writing, setWriting] = useState(false);
   const [saving, setSaving] = useState(false);
 
   function reset() {
     setTitle("");
     setRaw("");
-    setStory("");
     setCategory("memoria");
     setCustomCategoryName("");
     setChapter(CHAPTERS[0].slug);
@@ -79,38 +73,6 @@ export function MomentDialog({ open, onOpenChange }: Props) {
     setFiles([]);
     videoFiles.forEach((f) => URL.revokeObjectURL(f.preview));
     setVideoFiles([]);
-  }
-
-  async function handleWrite() {
-    if (raw.trim().length < 3) {
-      toast.error("Escreva algumas palavras primeiro.");
-      return;
-    }
-    setWriting(true);
-    try {
-      const currentChapterTitle =
-        chapter === "__custom_chapter__"
-          ? (customChapterTitle.trim() || "Capítulo Especial")
-          : chapterBySlug(chapter, dbChapters).title;
-
-      const currentFeeling = isCustomFeeling ? (customFeelingText.trim() || null) : feeling;
-
-      const result = await generate({
-        data: {
-          title,
-          rawText: raw,
-          feeling: currentFeeling,
-          childName: child?.name ?? null,
-          chapterTitle: currentChapterTitle,
-        },
-      });
-      setStory(result.story);
-      toast.success("A história ganhou vida. Você pode editar como quiser.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não conseguimos escrever agora.");
-    } finally {
-      setWriting(false);
-    }
   }
 
   async function handleSave() {
@@ -162,7 +124,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
       await create.mutateAsync({
         title: title.trim(),
         raw_text: raw.trim() || null,
-        story_text: (story.trim() || raw.trim()) as string,
+        story_text: raw.trim() as string,
         category: finalCategory,
         feeling: finalFeeling,
         happened_on: date,
@@ -215,42 +177,16 @@ export function MomentDialog({ open, onOpenChange }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="relato">O que aconteceu</Label>
+            <Label htmlFor="relato">Relato do momento (Sua história escrita com suas palavras)</Label>
             <Textarea
               id="relato"
               value={raw}
-              maxLength={2000}
+              maxLength={3000}
               onChange={(e) => setRaw(e.target.value)}
-              placeholder="Hoje ele deu os primeiros passos."
-              className="min-h-24 rounded-xl border-border bg-background"
+              placeholder="Escreva com detalhes e emoção como foi esse dia especial..."
+              className="min-h-36 rounded-xl border-border bg-background font-sans text-base leading-relaxed"
             />
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleWrite}
-              disabled={writing}
-              className="h-9 rounded-full border border-gold/40 bg-gold-soft/40 px-4 text-sm text-foreground hover:bg-gold-soft"
-            >
-              {writing ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Sparkles className="size-4 text-gold" strokeWidth={1.5} />
-              )}
-              Transformar em uma linda história
-            </Button>
           </div>
-
-          {story && (
-            <div className="animate-[var(--animate-rise)] space-y-2">
-              <Label htmlFor="historia">A história do seu livro</Label>
-              <Textarea
-                id="historia"
-                value={story}
-                onChange={(e) => setStory(e.target.value)}
-                className="min-h-40 rounded-xl border-gold/30 bg-gold-soft/20 font-display text-lg leading-relaxed"
-              />
-            </div>
-          )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -266,7 +202,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                     </SelectItem>
                   ))}
                   <SelectItem value="__custom_chapter__" className="font-medium text-gold">
-                    ✨ + Novo capítulo (Personalizar)
+                    + Novo capítulo (Personalizar)
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -292,7 +228,7 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                     </SelectItem>
                   ))}
                   <SelectItem value="__custom_category__" className="font-medium text-gold">
-                    ✨ + Outra categoria (Personalizar)
+                    + Outra categoria (Personalizar)
                   </SelectItem>
                 </SelectContent>
               </Select>

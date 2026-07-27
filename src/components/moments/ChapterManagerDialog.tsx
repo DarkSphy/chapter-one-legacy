@@ -232,7 +232,7 @@ export function ChapterManagerDialog({ open, onOpenChange }: Props) {
               className="w-full rounded-2xl border border-dashed border-gold/60 bg-gold-soft/10 py-6 text-sm font-medium text-gold hover:bg-gold-soft/20 shadow-none transition-all"
             >
               <Plus className="size-4 mr-2" />
-              ✨ + Criar Novo Capítulo / Época
+              Criar Novo Capítulo / Época
             </Button>
           ) : (
             <div className="space-y-3 rounded-2xl border border-gold/50 bg-gold-soft/20 p-5 animate-[var(--animate-rise)]">

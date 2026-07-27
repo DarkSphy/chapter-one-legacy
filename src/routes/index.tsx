@@ -214,21 +214,21 @@ function Landing() {
                 <div className="gold-rule my-6 h-px w-20" />
                 <ul className="space-y-6">
                   <li className="flex gap-4">
-                    <span className="text-gold font-bold text-xl">✦</span>
+                    <span className="w-2 h-2 rounded-full bg-gold mt-2 shrink-0" />
                     <div>
                       <h4 className="font-display text-xl">Autenticidade e liberdade total</h4>
                       <p className="text-sm text-muted-foreground mt-1">Você escreve os textos com as suas palavras e define suas categorias, sentimentos e capítulos exatamente como preferir.</p>
                     </div>
                   </li>
                   <li className="flex gap-4">
-                    <span className="text-gold font-bold text-xl">✦</span>
+                    <span className="w-2 h-2 rounded-full bg-gold mt-2 shrink-0" />
                     <div>
                       <h4 className="font-display text-xl">Clipes curtos direto da sua galeria</h4>
                       <p className="text-sm text-muted-foreground mt-1">Envie vídeos de até 5 segundos direto do seu aparelho, sem precisar de links externos. A própria plataforma gera o link para leitura no PDF.</p>
                     </div>
                   </li>
                   <li className="flex gap-4">
-                    <span className="text-gold font-bold text-xl">✦</span>
+                    <span className="w-2 h-2 rounded-full bg-gold mt-2 shrink-0" />
                     <div>
                       <h4 className="font-display text-xl">Pronto para imprimir quando quiser</h4>
                       <p className="text-sm text-muted-foreground mt-1">O livro é seu. Acesse online de qualquer aparelho ou faça o download do arquivo PDF diagramado para mandar imprimir.</p>

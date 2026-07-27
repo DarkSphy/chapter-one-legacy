@@ -94,7 +94,7 @@ export function getAllChapters(
 export const FEELINGS = [
   { value: "feliz", label: "Feliz", emoji: "🤍" },
   { value: "emocionado", label: "Emocionado", emoji: "🥹" },
-  { value: "orgulhoso", label: "Orgulhoso", emoji: "✨" },
+  { value: "orgulhoso", label: "Orgulhoso", emoji: "💛" },
   { value: "surpreso", label: "Surpreso", emoji: "🌙" },
   { value: "ansioso", label: "Ansioso", emoji: "🌿" },
   { value: "grato", label: "Grato", emoji: "🕊️" },
@@ -104,7 +104,7 @@ export function getFeeling(value?: string | null) {
   if (!value) return null;
   const found = FEELINGS.find((f) => f.value === value);
   if (found) return found;
-  return { value, label: value, emoji: "✨" };
+  return { value, label: value, emoji: "💛" };
 }
 
 export const CATEGORIES = [

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { differenceInDays, parseISO, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, Heart, Calendar, Clock, Sparkles } from "lucide-react";
+import { Loader2, Heart, Calendar, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -217,7 +217,7 @@ function Crianca() {
       ) : form.is_born && age ? (
         <section className="surface-paper overflow-hidden rounded-3xl p-8 border border-border shadow-lift">
           <div className="flex items-center gap-2 border-b border-border/50 pb-4 mb-4">
-            <Sparkles className="size-5 text-gold" />
+            <Heart className="size-5 text-gold" />
             <span className="label-eyebrow text-gold font-semibold">Idade do Bebê</span>
           </div>
           <div className="flex items-baseline gap-4">

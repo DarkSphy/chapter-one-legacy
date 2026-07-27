@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Sparkles, Video, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Video, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { MomentCover } from "@/components/moments/MomentCard";
 import { CHAPTERS, getAllChapters, type ChapterDef } from "@/lib/chapters";
@@ -137,7 +137,7 @@ function PageFace({ page, number }: { page: Page; number: number }) {
       {page.kind === "chapter" && (
         <div className="space-y-5 text-center">
           <p className="label-eyebrow flex items-center justify-center gap-1.5 text-gold">
-            <span>✨ Época da Nossa História</span>
+            <span>Época da Nossa História</span>
           </p>
           <h2 className="text-display text-4xl sm:text-5xl">{page.title}</h2>
           <div className="gold-rule mx-auto h-px w-16" />
