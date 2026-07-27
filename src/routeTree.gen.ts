@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedLivroRouteImport } from './routes/_authenticated/livro'
+import { Route as AuthenticatedLinhaDoTempoRouteImport } from './routes/_authenticated/linha-do-tempo'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedCriancaRouteImport } from './routes/_authenticated/crianca'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -28,39 +30,58 @@ const AuthenticatedLivroRoute = AuthenticatedLivroRouteImport.update({
   path: '/livro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLinhaDoTempoRoute =
+  AuthenticatedLinhaDoTempoRouteImport.update({
+    id: '/linha-do-tempo',
+    path: '/linha-do-tempo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   id: '/inicio',
   path: '/inicio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCriancaRoute = AuthenticatedCriancaRouteImport.update({
+  id: '/crianca',
+  path: '/crianca',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/crianca': typeof AuthenticatedCriancaRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/linha-do-tempo': typeof AuthenticatedLinhaDoTempoRoute
   '/livro': typeof AuthenticatedLivroRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/crianca': typeof AuthenticatedCriancaRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/linha-do-tempo': typeof AuthenticatedLinhaDoTempoRoute
   '/livro': typeof AuthenticatedLivroRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/crianca': typeof AuthenticatedCriancaRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/linha-do-tempo': typeof AuthenticatedLinhaDoTempoRoute
   '/_authenticated/livro': typeof AuthenticatedLivroRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/inicio' | '/livro'
+  fullPaths: '/' | '/crianca' | '/inicio' | '/linha-do-tempo' | '/livro'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/inicio' | '/livro'
+  to: '/' | '/crianca' | '/inicio' | '/linha-do-tempo' | '/livro'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/crianca'
     | '/_authenticated/inicio'
+    | '/_authenticated/linha-do-tempo'
     | '/_authenticated/livro'
   fileRoutesById: FileRoutesById
 }
@@ -92,6 +113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLivroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/linha-do-tempo': {
+      id: '/_authenticated/linha-do-tempo'
+      path: '/linha-do-tempo'
+      fullPath: '/linha-do-tempo'
+      preLoaderRoute: typeof AuthenticatedLinhaDoTempoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inicio': {
       id: '/_authenticated/inicio'
       path: '/inicio'
@@ -99,16 +127,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInicioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/crianca': {
+      id: '/_authenticated/crianca'
+      path: '/crianca'
+      fullPath: '/crianca'
+      preLoaderRoute: typeof AuthenticatedCriancaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCriancaRoute: typeof AuthenticatedCriancaRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedLinhaDoTempoRoute: typeof AuthenticatedLinhaDoTempoRoute
   AuthenticatedLivroRoute: typeof AuthenticatedLivroRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCriancaRoute: AuthenticatedCriancaRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedLinhaDoTempoRoute: AuthenticatedLinhaDoTempoRoute,
   AuthenticatedLivroRoute: AuthenticatedLivroRoute,
 }
 
