@@ -130,7 +130,13 @@ export async function uploadFile(file: File, path: string): Promise<string> {
   });
   if (error) throw error;
   return path;
-}\n\nexport async function uploadCoverImage(childId: string, file: File): Promise<string> {\n  const path = `cover/${childId}/${file.name}`;\n  await uploadFile(file, path);\n  return path;\n}
+}
+
+export async function uploadCoverImage(childId: string, file: File): Promise<string> {
+  const path = 'cover/' + childId + '/' + file.name;
+  await uploadFile(file, path);
+  return path;
+}
 
 export async function getSignedUrl(path: string | null | undefined): Promise<string | null> {
   if (!path) return null;
