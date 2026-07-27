@@ -66,19 +66,29 @@ export function getAllChapters(
   customChapters?: ChapterDef[]
 ): ChapterDef[] {
   const map = new Map<string, ChapterDef>();
-  CHAPTERS.forEach((c) => map.set(c.slug, c));
-  customChapters?.forEach((c) => map.set(c.slug, c));
-
-  let nextIdx = CHAPTERS.length + 1;
-  moments?.forEach((m) => {
-    if (!map.has(m.chapter_slug)) {
-      const def = chapterBySlug(m.chapter_slug, customChapters);
-      def.index = nextIdx++;
-      map.set(m.chapter_slug, def);
+  CHAPTERS.forEach((c) => map.set(c.slug, { ...c }));
+  customChapters?.forEach((c) => {
+    if (c.title === "__DELETED__") {
+      map.delete(c.slug);
+    } else {
+      map.set(c.slug, c);
     }
   });
 
-  return Array.from(map.values()).sort((a, b) => a.index - b.index);
+  let nextIdx = 100;
+  moments?.forEach((m) => {
+    if (!map.has(m.chapter_slug)) {
+      const def = chapterBySlug(m.chapter_slug, customChapters);
+      if (def && def.title !== "__DELETED__") {
+        def.index = nextIdx++;
+        map.set(m.chapter_slug, def);
+      }
+    }
+  });
+
+  return Array.from(map.values())
+    .filter((c) => c.title !== "__DELETED__")
+    .sort((a, b) => a.index - b.index);
 }
 
 export const FEELINGS = [

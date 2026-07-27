@@ -110,7 +110,9 @@ function PageFace({ page, number }: { page: Page; number: number }) {
 
       {page.kind === "chapter" && (
         <div className="space-y-5 text-center">
-          <p className="label-eyebrow">Capítulo {page.index}</p>
+          <p className="label-eyebrow flex items-center justify-center gap-1.5 text-gold">
+            <span>✨ Época da Nossa História</span>
+          </p>
           <h2 className="text-display text-4xl sm:text-5xl">{page.title}</h2>
           <div className="gold-rule mx-auto h-px w-16" />
           <p className="font-display text-lg text-muted-foreground italic">{page.subtitle}</p>

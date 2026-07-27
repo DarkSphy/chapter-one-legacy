@@ -25,6 +25,7 @@ import { useChild, useCreateMoment, useCustomChapters } from "@/hooks/useLibrary
 import { uploadFile, upsertCustomChapter } from "@/services/library";
 import { writeStory } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
+import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 
@@ -32,10 +33,10 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   const { data: child } = useChild();
   const { data: dbChapters } = useCustomChapters();
   const allChapters = getAllChapters(undefined, dbChapters);
-
   const create = useCreateMoment(child?.id ?? null);
   const generate = useServerFn(writeStory);
 
+  const [openChapterManager, setOpenChapterManager] = useState(false);
   const [title, setTitle] = useState("");
   const [raw, setRaw] = useState("");
   const [story, setStory] = useState("");

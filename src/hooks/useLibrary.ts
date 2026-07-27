@@ -9,6 +9,8 @@ import {
   upsertChild,
   signUrl,
   fetchCustomChapters,
+  upsertCustomChapter,
+  deleteCustomChapter,
 } from "@/services/library";
 import type { Child, MomentInput } from "@/types";
 
@@ -18,6 +20,29 @@ export function useChild() {
 
 export function useCustomChapters() {
   return useQuery({ queryKey: ["chapters"], queryFn: fetchCustomChapters });
+}
+
+export function useUpsertChapter() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ slug, title, subtitle, position }: { slug: string; title: string; subtitle?: string; position?: number }) =>
+      upsertCustomChapter(slug, title, subtitle, position),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["chapters"] });
+      qc.invalidateQueries({ queryKey: ["moments"] });
+    },
+  });
+}
+
+export function useDeleteChapter() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (slug: string) => deleteCustomChapter(slug),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["chapters"] });
+      qc.invalidateQueries({ queryKey: ["moments"] });
+    },
+  });
 }
 
 export function useSaveChild() {

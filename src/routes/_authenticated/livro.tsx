@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BookReader, buildPages } from "@/components/book/BookReader";
 import { useChild, useMoments, useCustomChapters } from "@/hooks/useLibrary";
+import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Settings2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/livro")({
   head: () => ({
@@ -26,14 +29,25 @@ function Livro() {
   const { data: dbChapters } = useCustomChapters();
   const { data: moments = [], isLoading } = useMoments();
   const pages = useMemo(() => buildPages(moments, child?.name ?? "", dbChapters), [moments, child, dbChapters]);
+  const [openChapterManager, setOpenChapterManager] = useState(false);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-14 sm:py-20">
-      <header className="mb-10 space-y-3 text-center">
+      <header className="mb-10 space-y-4 text-center">
         <p className="label-eyebrow">Meu livro</p>
         <h1 className="text-display text-4xl sm:text-5xl">
           {child?.name ? `O Livro de ${child.name}` : "O seu livro"}
         </h1>
+        <div className="flex justify-center pt-2">
+          <Button
+            onClick={() => setOpenChapterManager(true)}
+            variant="outline"
+            className="rounded-full border-gold/50 bg-gold-soft/10 text-gold hover:bg-gold-soft/20 text-xs px-5 shadow-xs transition-all duration-300 hover:scale-105"
+          >
+            <Settings2 className="size-3.5 mr-1.5" />
+            Personalizar e Organizar Épocas do Livro
+          </Button>
+        </div>
       </header>
 
       {isLoading ? (
@@ -49,6 +63,9 @@ function Livro() {
       ) : (
         <BookReader pages={pages} />
       )}
+
+      <ChapterManagerDialog open={openChapterManager} onOpenChange={setOpenChapterManager} />
     </div>
   );
 }
+

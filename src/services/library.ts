@@ -122,15 +122,22 @@ export async function fetchCustomChapters() {
     .select("*")
     .order("position", { ascending: true });
   if (error || !data) return [];
-  return data.map((row, idx) => ({
-    slug: row.slug,
-    index: row.position || 10 + idx,
-    title: row.title,
-    subtitle: row.subtitle || "Um capítulo especial da nossa história.",
-  }));
+  return data
+    .filter((row) => row.title !== "__DELETED__")
+    .map((row, idx) => ({
+      slug: row.slug,
+      index: row.position || 10 + idx,
+      title: row.title,
+      subtitle: row.subtitle || "Um capítulo especial da nossa história.",
+    }));
 }
 
-export async function upsertCustomChapter(slug: string, title: string, subtitle?: string) {
+export async function upsertCustomChapter(
+  slug: string,
+  title: string,
+  subtitle?: string,
+  position?: number
+) {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
   if (!userId) return;
@@ -142,7 +149,7 @@ export async function upsertCustomChapter(slug: string, title: string, subtitle?
         title,
         subtitle: subtitle || "Um capítulo especial da nossa história.",
         user_id: userId,
-        position: Date.now() % 1000000,
+        position: position ?? (Date.now() % 1000000),
       },
       { onConflict: "slug" },
     );
@@ -150,4 +157,27 @@ export async function upsertCustomChapter(slug: string, title: string, subtitle?
     console.error("Failed to save custom chapter to db:", err);
   }
 }
+
+export async function deleteCustomChapter(slug: string) {
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id;
+  if (!userId) return;
+
+  try {
+    // We upsert as __DELETED__ so even default chapters can be hidden by the user!
+    await supabase.from("chapters").upsert(
+      {
+        slug,
+        title: "__DELETED__",
+        subtitle: "",
+        user_id: userId,
+        position: 999999,
+      },
+      { onConflict: "slug" },
+    );
+  } catch (err) {
+    console.error("Failed to delete custom chapter from db:", err);
+  }
+}
+
 
