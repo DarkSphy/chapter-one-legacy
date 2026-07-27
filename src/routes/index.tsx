@@ -5,16 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Primeiros Capítulos — O livro da vida do seu filho" },
+      { title: "Primeiros Capítulos: O livro da vida do seu filho" },
       {
         name: "description",
         content:
-          "Transforme a gravidez e os primeiros anos do seu filho em um livro emocionante, escrito aos poucos com ajuda de inteligência artificial.",
+          "Transforme a gravidez e os primeiros anos do seu filho em um livro emocionante, escrito aos poucos por quem mais ama.",
       },
-      { property: "og:title", content: "Primeiros Capítulos — O livro da vida do seu filho" },
+      { property: "og:title", content: "Primeiros Capítulos: O livro da vida do seu filho" },
       {
         property: "og:description",
-        content: "Cada memória vira uma página. Cada página vira um legado.",
+        content: "Cada memória vira uma página. Cada página vira um legado eterno.",
       },
     ],
   }),
@@ -52,7 +52,7 @@ function Landing() {
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
               <a href="#como-funciona" className="hover:text-foreground transition-colors">Como funciona</a>
-              <a href="#capitulos" className="hover:text-foreground transition-colors">Os Capítulos</a>
+              <a href="#capitulos" className="hover:text-foreground transition-colors">Personalização</a>
               <a href="#diferenciais" className="hover:text-foreground transition-colors">Diferenciais</a>
               <a href="#faq" className="hover:text-foreground transition-colors">Dúvidas</a>
             </nav>
@@ -66,7 +66,7 @@ function Landing() {
       {/* Hero Section */}
       <main>
         <section className="mx-auto max-w-5xl px-6 pt-16 pb-16 text-center sm:pt-24 sm:pb-24">
-          <span className="label-eyebrow animate-[var(--animate-fade)]">Um legado, não apenas um aplicativo</span>
+          <span className="label-eyebrow animate-[var(--animate-fade)]">Um legado eterno, não apenas uma rede social</span>
           <h1 className="text-display mt-6 animate-[var(--animate-rise)] text-5xl sm:text-7xl leading-[1.08] text-balance">
             O livro mais importante
             <br />
@@ -74,7 +74,7 @@ function Landing() {
           </h1>
           <div className="gold-rule mx-auto my-8 h-px w-28" />
           <p className="mx-auto max-w-2xl font-display text-xl sm:text-2xl leading-relaxed text-muted-foreground italic font-light">
-            Escreva poucas linhas sobre um momento. Nossa inteligência artificial transforma em uma história emocionante — e cada memória vira uma página do livro dele.
+            Escreva os relatos com suas próprias palavras, anexe fotos marcantes e adicione links de vídeos. Sua história é diagramada como um livro editorial, acessível online a qualquer momento e entregue em arquivo PDF de alta resolução, pronto para imprimir onde e quando você quiser.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -92,44 +92,45 @@ function Landing() {
             </a>
           </div>
 
-          {/* New Visual Transformation Showcase (Replaces text chapter example) */}
+          {/* Visual Transformation Showcase */}
           <div className="mt-16 mx-auto surface-paper rounded-3xl p-6 sm:p-10 border border-border shadow-book animate-[var(--animate-page)] relative overflow-hidden">
             <div className="text-center mb-8">
-              <span className="label-eyebrow text-gold">A Magia do Processo</span>
-              <h3 className="font-display text-3xl mt-1">Do seu celular direto para as páginas da vida dele</h3>
+              <span className="label-eyebrow text-gold">A Magia do Legado</span>
+              <h3 className="font-display text-3xl mt-1">Das lembranças cotidianas direto para as páginas da vida dele</h3>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-8 items-center text-left">
-              {/* Left Side: Phone Audio/Text Input Card */}
-              <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-6 relative">
+              {/* Left Side: Memory Entry Card */}
+              <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-6 relative shadow-sm">
                 <div className="flex items-center justify-between border-b border-border/50 pb-3 mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-xs font-mono text-muted-foreground">Mensagem da Mãe • WhatsApp</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-gold animate-pulse"></span>
+                    <span className="text-xs font-mono text-muted-foreground">Registro de Memória: Fase 1º Ano</span>
                   </div>
-                  <span className="text-[10px] bg-gold-soft/40 text-gold px-2 py-0.5 rounded-full">30 segundos</span>
+                  <span className="text-[10px] bg-gold-soft/40 text-gold px-2.5 py-1 rounded-full font-medium">100% Personalizado</span>
                 </div>
                 <p className="text-sm font-sans text-foreground/90 italic leading-relaxed">
-                  "Oi! Hoje o Pedro deu os 3 primeiros passinhos no meio da sala. Ficou rindo e caiu nos meus braços... Chorei de emoção!"
+                  "Hoje o Pedro deu os primeiros passinhos no meio da sala. Ficou sorrindo e correu direto para os meus braços. Um dia que nunca esqueceremos."
                 </p>
-                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/30">
-                  <span>🎙️ Áudio gravado</span>
-                  <span>14:32</span>
+                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/30 font-medium">
+                  <span>📸 Foto anexada</span>
+                  <span>🎬 Link do Vídeo incluído</span>
                 </div>
               </div>
 
-              {/* Right Side: High End Book Mockup Image */}
+              {/* Right Side: Digital Book / PDF Showcase */}
               <div className="relative group">
                 <div className="rounded-2xl overflow-hidden border border-border shadow-lift relative">
                   <img 
                     src="/book-mockup.jpg" 
-                    alt="Livro Impresso Primeiros Capítulos" 
+                    alt="Livro Digital e PDF Primeiros Capítulos" 
                     className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent flex items-end p-5">
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent flex items-end p-5">
                     <div>
-                      <span className="text-xs font-display text-gold">Capa Dura Nobre • Impresso</span>
-                      <h4 className="font-display text-xl text-foreground mt-0.5">"Os Três Primeiros Passos"</h4>
+                      <span className="text-xs font-display text-gold">Acesso Digital & Arquivo PDF</span>
+                      <h4 className="font-display text-xl text-foreground mt-0.5">"Os Primeiros Passos na Sala"</h4>
+                      <p className="text-[11px] text-muted-foreground mt-1">Leia na plataforma ou exporte o arquivo para imprimir.</p>
                     </div>
                   </div>
                 </div>
@@ -143,55 +144,55 @@ function Landing() {
           <div className="mx-auto max-w-5xl px-6">
             <div className="text-center max-w-2xl mx-auto">
               <span className="label-eyebrow">Simplicidade & Afeto</span>
-              <h2 className="text-display text-4xl sm:text-5xl mt-3">Como nasce a história do seu filho</h2>
-              <p className="mt-3 text-muted-foreground">Sem precisar gastar horas escrevendo. Bastam 2 minutos por semana.</p>
+              <h2 className="text-display text-4xl sm:text-5xl mt-3">Como nasce o livro da sua família</h2>
+              <p className="mt-3 text-muted-foreground">Sem complicação ou perda de tempo. Bastam alguns minutos por semana ou no seu próprio ritmo.</p>
             </div>
 
             <div className="mt-14 grid gap-8 sm:grid-cols-3">
               <div className="surface-paper rounded-2xl p-8 text-center flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-gold-soft flex items-center justify-center font-display text-2xl text-primary font-medium mb-5">1</div>
-                <h3 className="font-display text-2xl">Você envia o momento</h3>
+                <h3 className="font-display text-2xl">Você registra o momento</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Envie uma frase curta, um áudio ou uma foto do dia. Pode ser uma descoberta, uma risada ou o primeiro dente.
+                  Escreva um relato sincero sobre um acontecimento marcante, anexe as melhores fotografias e inclua o link do vídeo de onde ele estiver armazenado na nuvem.
                 </p>
               </div>
 
               <div className="surface-paper rounded-2xl p-8 text-center flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-gold-soft flex items-center justify-center font-display text-2xl text-primary font-medium mb-5">2</div>
-                <h3 className="font-display text-2xl">A IA dá vida às palavras</h3>
+                <h3 className="font-display text-2xl">Organização por épocas</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Nossa inteligência afetuosa transforma seu relato cru em um texto emocionante, sensível e poético.
+                  O sistema agrupa suas lembranças em capítulos e fases literárias, sem numerações forçadas. Você tem controle total para criar e reordenar as etapas da infância.
                 </p>
               </div>
 
               <div className="surface-paper rounded-2xl p-8 text-center flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-gold-soft flex items-center justify-center font-display text-2xl text-primary font-medium mb-5">3</div>
-                <h3 className="font-display text-2xl">Você recebe o livro físico</h3>
+                <h3 className="font-display text-2xl">Acesso digital ou PDF</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  As memórias organizadas viram um livro impresso de capa dura com qualidade de colecionador para guardar para sempre.
+                  Leia o livro interativo com cinema na própria plataforma, ou gere o arquivo em formato PDF com links de acesso aos vídeos para imprimir quando desejar.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Os Capítulos */}
+        {/* Os Capítulos e Customização */}
         <section id="capitulos" className="py-20">
           <div className="mx-auto max-w-5xl px-6">
             <div className="text-center max-w-2xl mx-auto">
-              <span className="label-eyebrow">Estágios do Crescimento</span>
-              <h2 class="text-display text-4xl sm:text-5xl mt-3">Cada fase, um capítulo especial</h2>
-              <p className="mt-3 text-muted-foreground">O livro é organizado cronologicamente para acompanhar toda a infância.</p>
+              <span className="label-eyebrow">Liberdade & Personalização</span>
+              <h2 className="text-display text-4xl sm:text-5xl mt-3">Capítulos definidos por você</h2>
+              <p className="mt-3 text-muted-foreground">Sua história não segue fórmulas prontas. Você escolhe os nomes das fases sem ficar preso a números engessados.</p>
             </div>
 
             <div className="mt-12 grid gap-6 sm:grid-cols-3">
               {[
-                { t: "Capítulo 1: A Espera", d: "Antes de você nascer, a descoberta e a gestação." },
-                { t: "Capítulo 2: A Chegada", d: "As primeiras horas, o quarto e o primeiro abraço." },
-                { t: "Capítulo 3: Primeiras Descobertas", d: "O primeiro sorriso, os passos e as primeiras palavras." },
-              ].map((item) => (
+                { t: "Fase da Espera", d: "As lembranças da gestação, os preparativos do quarto e o chá de bebê." },
+                { t: "A Chegada em Casa", d: "Os primeiros dias de resguardo, o acolhimento da família e o primeiro banho." },
+                { t: "Capítulos Especiais", d: "Crie suas próprias épocas: o batizado, a primeira viagem à praia ou os aniversários." },
+              ].map((item, idx) => (
                 <div key={item.t} className="surface-paper rounded-2xl p-7 border border-border/80 hover:border-gold/50 transition-colors">
-                  <span className="label-eyebrow text-gold">Livro I</span>
+                  <span className="label-eyebrow text-gold">Época Literária {idx + 1}</span>
                   <h3 className="mt-2 font-display text-2xl">{item.t}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{item.d}</p>
                 </div>
@@ -205,29 +206,29 @@ function Landing() {
           <div className="mx-auto max-w-5xl px-6">
             <div className="grid gap-12 sm:grid-cols-2 items-center">
               <div>
-                <span className="label-eyebrow">Feito para Gerações</span>
+                <span className="label-eyebrow">Feito para Famílias</span>
                 <h2 className="text-display text-4xl sm:text-5xl mt-3">Por que o Primeiros Capítulos é único?</h2>
                 <div className="gold-rule my-6 h-px w-20" />
                 <ul className="space-y-6">
                   <li className="flex gap-4">
                     <span className="text-gold font-bold text-xl">✦</span>
                     <div>
-                      <h4 className="font-display text-xl">Tom poético e emocionante</h4>
-                      <p className="text-sm text-muted-foreground mt-1">A IA não cria respostas robóticas, mas ajusta a narrativa com o carinho de uma memória familiar.</p>
+                      <h4 className="font-display text-xl">Autenticidade e liberdade total</h4>
+                      <p className="text-sm text-muted-foreground mt-1">Você escreve os textos com as suas palavras e define suas categorias, sentimentos e capítulos exatamente como preferir.</p>
                     </div>
                   </li>
                   <li className="flex gap-4">
                     <span className="text-gold font-bold text-xl">✦</span>
                     <div>
-                      <h4 className="font-display text-xl">Privacidade total da família</h4>
-                      <p className="text-sm text-muted-foreground mt-1">Suas fotos e textos nunca são compartilhados ou usados para treinar redes públicas.</p>
+                      <h4 className="font-display text-xl">Vídeo integrado e acessível no PDF</h4>
+                      <p className="text-sm text-muted-foreground mt-1">O livro digital possui cinema de lembranças, e ao gerar o PDF, cada vídeo conta com um link para acesso em qualquer lugar.</p>
                     </div>
                   </li>
                   <li className="flex gap-4">
                     <span className="text-gold font-bold text-xl">✦</span>
                     <div>
-                      <h4 className="font-display text-xl">Impressão em papel nobre</h4>
-                      <p className="text-sm text-muted-foreground mt-1">O livro físico é impresso com acabamento atemporal para resistir a décadas de leitura.</p>
+                      <h4 className="font-display text-xl">Pronto para imprimir quando quiser</h4>
+                      <p className="text-sm text-muted-foreground mt-1">O livro é seu. Acesse online de qualquer aparelho ou faça o download do arquivo PDF diagramado para mandar imprimir.</p>
                     </div>
                   </li>
                 </ul>
@@ -235,7 +236,7 @@ function Landing() {
 
               <div className="surface-paper rounded-3xl p-8 border border-border shadow-lift">
                 <blockquote className="font-display text-2xl italic text-foreground leading-relaxed">
-                  "Quando meu filho fizer 18 anos, não vou entregar um feed de rede social. Vou entregar este livro impresso nas mãos dele."
+                  "Quando meu filho crescer, não vou mostrar apenas postagens em redes sociais. Vou entregar o arquivo PDF e o livro impresso da história dele."
                 </blockquote>
                 <div className="mt-6 flex items-center gap-4 border-t border-border pt-4">
                   <div className="w-10 h-10 rounded-full bg-gold-soft flex items-center justify-center font-display font-bold text-primary">C</div>
@@ -260,20 +261,20 @@ function Landing() {
             <div className="space-y-4">
               {[
                 {
-                  q: "Como a inteligência artificial ajuda a escrever o livro?",
-                  a: "Você só precisa digitar frases curtas ou mandar um áudio com suas memórias. A nossa IA organiza a cronologia e reescreve os fatos com uma linguagem emocionante e fluida, sem perder a essência do seu relato."
+                  q: "Como recebo e acesso o meu livro terminado?",
+                  a: "O livro fica disponível em tempo real na plataforma para você ler, editar e assistir aos vídeos de qualquer dispositivo conectado à internet. Quando desejar, você pode exportar a edição completa em formato PDF de alta resolução."
                 },
                 {
-                  q: "Preciso escrever todos os dias?",
-                  a: "Não! O Primeiros Capítulos foi pensado para a rotina corrida de pais. Escrever 1 vez por semana ou até 1 vez por mês é suficiente para criar um livro completo ao final do ano."
+                  q: "Posso imprimir o arquivo PDF em uma gráfica ou em casa?",
+                  a: "Com certeza. O nosso arquivo PDF já é entregue totalmente diagramado no formato de livro editorial de luxo. Basta salvar o arquivo e imprimir onde você preferir para ter a versão física nas mãos."
                 },
                 {
-                  q: "Quando recebo o livro impresso?",
-                  a: "Ao completar os capítulos de uma fase (ex: 1º Ano de Vida), você pode revisar todas as páginas, escolher a foto da capa e solicitar a impressão direta na sua casa."
+                  q: "Como funcionam os vídeos na versão em PDF e na impressão?",
+                  a: "No livro digital online, você assiste aos vídeos diretamente na tela. Na versão em PDF ou impressa, criamos um quadro especial com o endereço (link) do vídeo em nuvem para que o leitor possa acessar facilmente através do computador ou celular."
                 },
                 {
-                  q: "Minhas memórias e fotos estão seguras?",
-                  a: "Sim. Usamos criptografia de ponta a ponta. Seus dados pertencem unicamente a você e sua família."
+                  q: "Sou obrigado a usar números fixos como Capítulo 1 e Capítulo 2?",
+                  a: "Não. Nós liberamos a estrutura de numeração fixa. Você pode criar, renomear, excluir ou reordenar as fases da vida do seu filho com liberdade total, usando títulos poéticos ou datas que façam sentido para a sua família."
                 }
               ].map((faq, idx) => (
                 <div key={idx} className="surface-paper rounded-xl border border-border overflow-hidden transition-colors">
@@ -282,7 +283,7 @@ function Landing() {
                     className="w-full px-6 py-5 text-left font-display text-xl flex justify-between items-center gap-4"
                   >
                     <span>{faq.q}</span>
-                    <span className="text-gold text-2xl font-light">{activeFaq === idx ? "−" : "+"}</span>
+                    <span className="text-gold text-2xl font-light">{activeFaq === idx ? "+" : "-"}</span>
                   </button>
                   {activeFaq === idx && (
                     <div className="px-6 pb-5 text-sm text-muted-foreground leading-relaxed border-t border-border/40 pt-4">
@@ -302,7 +303,7 @@ function Landing() {
               Comece a escrever o legado da sua família hoje.
             </h2>
             <p className="mt-4 font-display text-xl text-primary-foreground/80 italic">
-              Cada momento que passa é um momento que merece ser lembrado.
+              Cada momento que passa merece ser guardado para sempre.
             </p>
             <Link
               to="/auth"
@@ -319,7 +320,7 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="font-display text-lg text-foreground font-medium">Primeiros Capítulos</span>
-            <span>— Cada página vira um legado.</span>
+            <span>: Cada página vira um legado.</span>
           </div>
           <p className="text-xs">&copy; {new Date().getFullYear()} Primeiros Capítulos. Todos os direitos reservados.</p>
         </div>
@@ -327,4 +328,3 @@ function Landing() {
     </div>
   );
 }
-
