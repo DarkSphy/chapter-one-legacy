@@ -5,6 +5,7 @@ import { useChild, useMoments, useCustomChapters } from "@/hooks/useLibrary";
 import { ChapterManagerDialog } from "@/components/moments/ChapterManagerDialog";
 import { Button } from "@/components/ui/button";
 import { Settings2 } from "lucide-react";
+import { BabyProgressWidget } from "@/components/dashboard/BabyProgressWidget";
 
 export const Route = createFileRoute("/_authenticated/livro")({
   head: () => ({
@@ -28,7 +29,7 @@ function Livro() {
   const { data: child } = useChild();
   const { data: dbChapters } = useCustomChapters();
   const { data: moments = [], isLoading } = useMoments();
-  const pages = useMemo(() => buildPages(moments, child?.name ?? "", dbChapters), [moments, child, dbChapters]);
+  const pages = useMemo(() => buildPages(moments, child ?? null, dbChapters), [moments, child, dbChapters]);
   const [openChapterManager, setOpenChapterManager] = useState(false);
 
   return (
@@ -49,6 +50,8 @@ function Livro() {
           </Button>
         </div>
       </header>
+
+      <BabyProgressWidget child={child} />
 
       {isLoading ? (
         <div className="h-[34rem] animate-pulse rounded-[2rem] bg-secondary/60" />

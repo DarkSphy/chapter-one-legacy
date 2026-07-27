@@ -4,7 +4,7 @@ import { ArrowUpRight, Image as ImageIcon, Trash2, Loader2 } from "lucide-react"
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSignedUrl, useDeleteMoment } from "@/hooks/useLibrary";
-import { getFeeling, chapterBySlug } from "@/lib/chapters";
+import { getFeeling, chapterBySlug, getCategoryLabel } from "@/lib/chapters";
 import type { Moment } from "@/types";
 
 export function MomentCover({
@@ -50,11 +50,17 @@ export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => 
   }
 
   return (
-    <article className="group surface-paper overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] relative">
-      <MomentCover path={moment.cover_url} className="h-56 w-full sm:h-64" />
+    <article
+      onClick={onOpen}
+      className="surface-paper group relative cursor-pointer overflow-hidden rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift border border-border/60"
+    >
+      <MomentCover
+        path={moment.cover_url}
+        className="h-56 w-full transition-transform duration-700 group-hover:scale-105"
+      />
       
-      {/* Delete Moment Button */}
       <button
+        type="button"
         onClick={handleDelete}
         disabled={isDeleting}
         title="Excluir este momento"
@@ -64,11 +70,21 @@ export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => 
       </button>
 
       <div className="space-y-3 p-6">
-        <div className="flex items-center gap-2 text-xs tracking-[0.18em] text-muted-foreground uppercase">
+        <div className="flex flex-wrap items-center gap-2 text-xs tracking-wider text-muted-foreground">
           <span>{format(parseISO(moment.happened_on), "d 'de' MMMM, yyyy", { locale: ptBR })}</span>
+          {feeling && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-gold-soft/30 px-2.5 py-0.5 text-[11px] font-medium text-foreground border border-gold/40">
+              <span>{feeling.emoji}</span>
+              <span>{feeling.label}</span>
+            </span>
+          )}
+          {moment.category && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-[11px] text-foreground/80">
+              {getCategoryLabel(moment.category)}
+            </span>
+          )}
         </div>
-        <h3 className="font-display text-2xl leading-tight font-light">
-          {feeling ? `${feeling.emoji} ` : ""}
+        <h3 className="font-display text-2xl leading-tight font-light text-foreground">
           {moment.title}
         </h3>
         <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">

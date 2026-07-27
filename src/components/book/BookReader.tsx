@@ -3,26 +3,30 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Video, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 import { MomentCover } from "@/components/moments/MomentCard";
-import { CHAPTERS, getAllChapters, type ChapterDef } from "@/lib/chapters";
+import { CHAPTERS, getAllChapters, getFeeling, getCategoryLabel, type ChapterDef } from "@/lib/chapters";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUpdateStory, useSignedUrl } from "@/hooks/useLibrary";
 import type { Moment } from "@/types";
 
 type Page =
-  | { kind: "cover"; title: string; subtitle: string }
+  | { kind: "cover"; title: string; subtitle: string; child?: any }
   | { kind: "chapter"; index: number; title: string; subtitle: string }
   | { kind: "moment"; moment: Moment }
   | { kind: "photo"; moment: Moment }
   | { kind: "video"; moment: Moment; video: { url: string; media_type: string } }
   | { kind: "end" };
 
-export function buildPages(moments: Moment[], childName: string, customChapters?: ChapterDef[]): Page[] {
+export function buildPages(moments: Moment[], child: any | null, customChapters?: ChapterDef[]): Page[] {
+  const childName = typeof child === "string" ? child : (child?.name ?? "");
+  const childObj = typeof child === "object" ? child : null;
   const pages: Page[] = [
     {
       kind: "cover",
       title: childName ? `O Livro de ${childName}` : "O seu livro",
       subtitle: "Uma história escrita aos poucos, por quem mais ama.",
+      child: childObj,
     },
   ];
 
@@ -126,11 +130,57 @@ function PageFace({ page, number }: { page: Page; number: number }) {
   return (
     <div className="relative flex min-h-[26rem] flex-col justify-center bg-paper px-8 py-12 sm:min-h-[34rem] sm:px-12 transition-all duration-500 hover:shadow-inner">
       {page.kind === "cover" && (
-        <div className="space-y-6 text-center">
-          <p className="label-eyebrow">Primeiros Capítulos</p>
-          <h2 className="text-display text-4xl sm:text-5xl">{page.title}</h2>
-          <div className="gold-rule mx-auto h-px w-24" />
-          <p className="font-display text-lg text-muted-foreground italic">{page.subtitle}</p>
+        <div className="space-y-6 text-center py-4">
+          <p className="label-eyebrow tracking-widest text-gold font-semibold uppercase">Primeiros Capítulos · Diário de Memórias</p>
+          <h2 className="text-display text-4xl sm:text-6xl text-foreground font-light">{page.title}</h2>
+          <div className="gold-rule mx-auto h-px w-28 my-6" />
+          <p className="font-display text-lg text-muted-foreground italic max-w-md mx-auto">{page.subtitle}</p>
+
+          {page.child && (
+            <div className="mt-8 pt-6 border-t border-gold/30 max-w-md mx-auto space-y-3 bg-gold-soft/10 p-6 rounded-2xl border text-left sm:text-center animate-[var(--animate-fade)]">
+              <h4 className="font-display text-xs text-gold uppercase tracking-wider font-semibold text-center">Dados de Registro do Livro</h4>
+              <div className="text-sm space-y-1.5 text-foreground/90 pt-1">
+                {page.child.mother_name && (
+                  <p><strong className="text-muted-foreground font-normal">Mãe / Família:</strong> {page.child.mother_name}</p>
+                )}
+                {!page.child.is_born ? (
+                  <>
+                    {page.child.last_period_date && (
+                      <p><strong className="text-muted-foreground font-normal">Início da Gestação:</strong> {format(parseISO(page.child.last_period_date), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
+                    )}
+                    {page.child.due_date && (
+                      <p><strong className="text-muted-foreground font-normal">Previsão de Chegada (DPP):</strong> {format(parseISO(page.child.due_date), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {page.child.birth_date && (
+                      <p><strong className="text-muted-foreground font-normal">Nascimento:</strong> {format(parseISO(page.child.birth_date), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
+                    )}
+                    {(page.child.birth_weight_grams || page.child.birth_height_cm) && (
+                      <p>
+                        {page.child.birth_weight_grams && <span className="mr-3"><strong className="text-muted-foreground font-normal">Peso:</strong> {(page.child.birth_weight_grams >= 100 ? (page.child.birth_weight_grams / 1000).toFixed(2) + " kg" : page.child.birth_weight_grams + " g")}</span>}
+                        {page.child.birth_height_cm && <span><strong className="text-muted-foreground font-normal">Altura:</strong> {page.child.birth_height_cm} cm</span>}
+                      </p>
+                    )}
+                    {(page.child.eye_color || page.child.hair_color) && (
+                      <p className="text-xs text-muted-foreground pt-1">
+                        {page.child.eye_color && <span className="mr-2">Olhos: {page.child.eye_color}</span>}
+                        {page.child.hair_color && <span>Cabelos: {page.child.hair_color}</span>}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="pt-3 text-center">
+                <Link to="/crianca">
+                  <span className="inline-flex items-center gap-1.5 text-xs text-gold hover:underline font-medium">
+                    <Edit3 className="size-3.5" /> Configurar ou Modificar Dados da Capa
+                  </span>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -183,7 +233,25 @@ function PageFace({ page, number }: { page: Page; number: number }) {
             )}
           </div>
 
-          <h3 className="font-display text-3xl font-light">{page.moment.title}</h3>
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {page.moment.feeling && (() => {
+                const f = getFeeling(page.moment.feeling);
+                return f ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gold-soft/30 px-3 py-0.5 text-xs font-medium text-foreground border border-gold/40">
+                    <span>{f.emoji}</span>
+                    <span>{f.label}</span>
+                  </span>
+                ) : null;
+              })()}
+              {page.moment.category && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-0.5 text-xs text-foreground/80">
+                  {getCategoryLabel(page.moment.category)}
+                </span>
+              )}
+            </div>
+            <h3 className="font-display text-3xl font-light text-foreground">{page.moment.title}</h3>
+          </div>
 
           {/* Editable Story Textarea or Display */}
           {isEditing ? (

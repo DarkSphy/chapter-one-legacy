@@ -4,6 +4,7 @@ import { BookOpen, Feather } from "lucide-react";
 import { useChild, useMoments } from "@/hooks/useLibrary";
 import { MomentCard } from "@/components/moments/MomentCard";
 import { CHAPTERS, pagesFromMoments } from "@/lib/chapters";
+import { BabyProgressWidget } from "@/components/dashboard/BabyProgressWidget";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -49,6 +50,8 @@ function Inicio() {
             : `Você já registrou ${moments.length} ${moments.length === 1 ? "momento especial" : "momentos especiais"}.`}
         </p>
       </header>
+
+      <BabyProgressWidget child={child} />
 
       <section className="surface-paper mt-10 animate-[var(--animate-rise)] overflow-hidden rounded-[2rem] p-8 sm:p-12">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">

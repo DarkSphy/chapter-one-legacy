@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useChild, useSaveChild, useMoments } from "@/hooks/useLibrary";
 import { MomentCover } from "@/components/moments/MomentCard";
+import { BabyProgressWidget } from "@/components/dashboard/BabyProgressWidget";
 
 export const Route = createFileRoute("/_authenticated/crianca")({
   head: () => ({
@@ -22,146 +23,81 @@ export const Route = createFileRoute("/_authenticated/crianca")({
       { property: "og:title", content: "Perfil do Bebê & Mãe — Primeiros Capítulos" },
       {
         property: "og:description",
-        content: "Os detalhes que dão nome e rosto ao livro da sua família.",
+        content: "Acompanhe e edite as informações mais valiosas do seu bebê e da gestação.",
       },
     ],
   }),
   component: Crianca,
 });
 
-type Form = {
-  name: string;
-  mother_name: string;
-  is_born: boolean;
-  birth_date: string;
-  due_date: string;
-  last_period_date: string;
-  birth_weight_grams: string;
-  birth_height_cm: string;
-  eye_color: string;
-  hair_color: string;
-};
-
-const empty: Form = {
-  name: "",
-  mother_name: "",
-  is_born: false,
-  birth_date: "",
-  due_date: "",
-  last_period_date: "",
-  birth_weight_grams: "",
-  birth_height_cm: "",
-  eye_color: "",
-  hair_color: "",
-};
-
-function getGestationDetails(lastPeriod: string | null, dueDate: string | null) {
-  let totalDays = 0;
-  if (lastPeriod) {
-    totalDays = Math.max(0, differenceInDays(new Date(), parseISO(lastPeriod)));
-  } else if (dueDate) {
-    const daysUntilDue = differenceInDays(parseISO(dueDate), new Date());
-    totalDays = Math.max(0, 280 - daysUntilDue);
-  }
-
-  if (totalDays <= 0) return null;
-
-  const weeks = Math.floor(totalDays / 7);
-  const days = totalDays % 7;
-  const remainingDays = Math.max(0, 280 - totalDays);
-  const remainingWeeks = Math.ceil(remainingDays / 7);
-
-  return {
-    weeks,
-    days,
-    totalDays,
-    remainingDays,
-    remainingWeeks,
-    progressPercentage: Math.min(100, Math.round((totalDays / 280) * 100)),
-  };
-}
-
-function getAgeDetails(birthDate: string | null) {
-  if (!birthDate) return null;
-  const totalDays = Math.max(0, differenceInDays(new Date(), parseISO(birthDate)));
-  const months = Math.floor(totalDays / 30.43);
-  const years = Math.floor(months / 12);
-  const remainingMonths = months % 12;
-
-  return {
-    totalDays,
-    months,
-    years,
-    remainingMonths,
-  };
-}
-
 function Crianca() {
   const { data: child, isLoading } = useChild();
-  const save = useSaveChild();
   const { data: moments = [] } = useMoments();
-  const [form, setForm] = useState<Form>(empty);
+  const save = useSaveChild();
+
+  const [form, setForm] = useState({
+    name: "",
+    mother_name: "",
+    birth_date: "",
+    last_period_date: "",
+    due_date: "",
+    birth_weight_grams: "",
+    birth_height_cm: "",
+    eye_color: "",
+    hair_color: "",
+    is_born: false,
+  });
 
   useEffect(() => {
-    if (!child) return;
-    setForm({
-      name: child.name ?? "",
-      mother_name: child.mother_name ?? "",
-      is_born: child.is_born,
-      birth_date: child.birth_date ?? "",
-      due_date: child.due_date ?? "",
-      last_period_date: child.last_period_date ?? "",
-      birth_weight_grams: child.birth_weight_grams?.toString() ?? "",
-      birth_height_cm: child.birth_height_cm?.toString() ?? "",
-      eye_color: child.eye_color ?? "",
-      hair_color: child.hair_color ?? "",
-    });
+    if (child) {
+      setForm({
+        name: child.name ?? "",
+        mother_name: child.mother_name ?? "",
+        birth_date: child.birth_date ? child.birth_date.slice(0, 10) : "",
+        last_period_date: child.last_period_date ? child.last_period_date.slice(0, 10) : "",
+        due_date: child.due_date ? child.due_date.slice(0, 10) : "",
+        birth_weight_grams: child.birth_weight_grams?.toString() ?? "",
+        birth_height_cm: child.birth_height_cm?.toString() ?? "",
+        eye_color: child.eye_color ?? "",
+        hair_color: child.hair_color ?? "",
+        is_born: child.is_born ?? false,
+      });
+    }
   }, [child]);
 
-  const gestation = getGestationDetails(form.last_period_date || null, form.due_date || null);
-  const age = getAgeDetails(form.birth_date || null);
+  async function handleSave() {
+    try {
+      await save.mutateAsync({
+        id: child?.id,
+        name: form.name.trim() || null,
+        mother_name: form.mother_name.trim() || null,
+        birth_date: form.birth_date || null,
+        last_period_date: form.last_period_date || null,
+        due_date: form.due_date || null,
+        birth_weight_grams: form.birth_weight_grams ? parseInt(form.birth_weight_grams, 10) : null,
+        birth_height_cm: form.birth_height_cm ? parseFloat(form.birth_height_cm) : null,
+        eye_color: form.eye_color.trim() || null,
+        hair_color: form.hair_color.trim() || null,
+        is_born: form.is_born,
+      });
+      toast.success("Informações salvas com sucesso!");
+    } catch (error) {
+      toast.error("Não foi possível salvar os dados.");
+    }
+  }
 
   const ultrasounds = moments.filter(
     (m) => m.category === "ultrassom" || m.category === "gestacao",
   );
 
-  async function handleSave() {
-    if (!form.name.trim()) {
-      toast.error("Preencha o nome do bebê.");
-      return;
-    }
-    try {
-      await save.mutateAsync({
-        id: child?.id,
-        name: form.name.trim(),
-        mother_name: form.mother_name.trim() || null,
-        is_born: form.is_born,
-        birth_date: form.birth_date || null,
-        due_date: form.due_date || null,
-        last_period_date: form.last_period_date || null,
-        birth_weight_grams: form.birth_weight_grams ? Number(form.birth_weight_grams) : null,
-        birth_height_cm: form.birth_height_cm ? Number(form.birth_height_cm) : null,
-        eye_color: form.eye_color || null,
-        hair_color: form.hair_color || null,
-      });
-      toast.success("Perfil da família salvo com sucesso.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não conseguimos salvar.");
-    }
-  }
-
   if (isLoading) {
-    return (
-      <div className="mx-auto max-w-3xl px-5 py-20">
-        <div className="h-96 animate-pulse rounded-3xl bg-secondary/60" />
-      </div>
-    );
+    return <div className="h-96 animate-pulse rounded-[2rem] bg-secondary/60 mx-auto max-w-4xl mt-12" />;
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-14 sm:py-20 space-y-10">
-      <header className="space-y-3">
-        <p className="label-eyebrow">Perfil da Família</p>
+    <div className="mx-auto max-w-4xl px-5 py-14 sm:py-20 space-y-12 animate-[var(--animate-rise)]">
+      <header className="space-y-3 text-center sm:text-left">
+        <p className="label-eyebrow">Configurações & Memórias</p>
         <h1 className="text-display text-4xl sm:text-5xl">
           {form.mother_name ? `Mãe: ${form.mother_name}` : "Perfil da Mãe e do Bebê"}
         </h1>
@@ -171,65 +107,7 @@ function Crianca() {
       </header>
 
       {/* Real-time Gestation or Age Dashboard Widget */}
-      {!form.is_born && gestation ? (
-        <section className="surface-paper overflow-hidden rounded-3xl p-8 border border-border shadow-lift relative">
-          <div className="flex items-center justify-between border-b border-border/50 pb-4 mb-6">
-            <div className="flex items-center gap-2">
-              <Heart className="size-5 text-gold animate-pulse" />
-              <span className="label-eyebrow text-gold font-semibold">Painel da Gestante</span>
-            </div>
-            <span className="text-xs bg-gold-soft/50 text-foreground px-3 py-1 rounded-full font-medium">
-              {gestation.totalDays} dias de gestação
-            </span>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-6 items-center">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Tempo Atual</p>
-              <h2 className="text-display text-4xl sm:text-5xl text-foreground mt-1">
-                {gestation.weeks} <span className="text-2xl font-light">semanas</span>
-                {gestation.days > 0 && <span className="text-2xl font-light"> e {gestation.days} {gestation.days === 1 ? 'dia' : 'dias'}</span>}
-              </h2>
-              <p className="mt-3 text-sm text-muted-foreground italic">
-                Faltam aproximadamente {gestation.remainingWeeks} semanas ({gestation.remainingDays} dias) para a chegada.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs font-medium">
-                <span>Progresso da Gestação</span>
-                <span className="text-gold">{gestation.progressPercentage}% concluído</span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-gold-soft to-gold transition-all duration-1000"
-                  style={{ width: `${gestation.progressPercentage}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-[11px] text-muted-foreground">
-                <span>Semana 1</span>
-                <span>Semana 20</span>
-                <span>Semana 40</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : form.is_born && age ? (
-        <section className="surface-paper overflow-hidden rounded-3xl p-8 border border-border shadow-lift">
-          <div className="flex items-center gap-2 border-b border-border/50 pb-4 mb-4">
-            <Heart className="size-5 text-gold" />
-            <span className="label-eyebrow text-gold font-semibold">Idade do Bebê</span>
-          </div>
-          <div className="flex items-baseline gap-4">
-            <h2 className="text-display text-4xl sm:text-5xl">
-              {age.years > 0 ? `${age.years} ${age.years === 1 ? 'ano' : 'anos'}` : ''}
-              {age.remainingMonths > 0 ? ` ${age.remainingMonths} ${age.remainingMonths === 1 ? 'mês' : 'meses'}` : ''}
-              {age.years === 0 && age.remainingMonths === 0 ? `${age.totalDays} dias` : ''}
-            </h2>
-            <span className="text-sm text-muted-foreground">({age.totalDays} dias de vida registrados)</span>
-          </div>
-        </section>
-      ) : null}
+      <BabyProgressWidget child={{ ...child, ...form, birth_weight_grams: form.birth_weight_grams ? parseInt(form.birth_weight_grams, 10) : null, birth_height_cm: form.birth_height_cm ? parseFloat(form.birth_height_cm) : null } as any} />
 
       {/* Main Registration Form */}
       <section className="surface-paper space-y-6 rounded-3xl p-7 sm:p-9 border border-border">
@@ -324,7 +202,7 @@ function Crianca() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="dum">Data da última menstruação (DUM)</Label>
+              <Label htmlFor="dum">Dia exato do início da gravidez (ou data em que soube)</Label>
               <Input
                 id="dum"
                 type="date"
@@ -332,9 +210,10 @@ function Crianca() {
                 onChange={(e) => setForm({ ...form, last_period_date: e.target.value })}
                 className="rounded-xl bg-background"
               />
+              <p className="text-[11px] text-muted-foreground">Esta data alimenta o contador em tempo real em todas as páginas do aplicativo.</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dpp">Data provável do parto (DPP)</Label>
+              <Label htmlFor="dpp">Previsão da chegada do bebê (Data Provável)</Label>
               <Input
                 id="dpp"
                 type="date"
@@ -342,6 +221,7 @@ function Crianca() {
                 onChange={(e) => setForm({ ...form, due_date: e.target.value })}
                 className="rounded-xl bg-background"
               />
+              <p className="text-[11px] text-muted-foreground">Usada para estimar quantas semanas faltam para o nascimento.</p>
             </div>
           </div>
         )}
