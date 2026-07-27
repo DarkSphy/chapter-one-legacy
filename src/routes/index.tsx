@@ -74,7 +74,7 @@ function Landing() {
           </h1>
           <div className="gold-rule mx-auto my-8 h-px w-28" />
           <p className="mx-auto max-w-2xl font-display text-xl sm:text-2xl leading-relaxed text-muted-foreground italic font-light">
-            Escreva os relatos com suas próprias palavras, anexe fotos marcantes e adicione links de vídeos. Sua história é diagramada como um livro editorial, acessível online a qualquer momento e entregue em arquivo PDF de alta resolução, pronto para imprimir onde e quando você quiser.
+            Escreva os relatos com suas próprias palavras, anexe fotos marcantes e envie clipes de vídeo de até 5 segundos direto da sua galeria. Sua história é diagramada como um livro editorial, acessível online e entregue em arquivo PDF de alta resolução, pronto para imprimir onde e quando quiser.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -105,32 +105,35 @@ function Landing() {
                 <div className="flex items-center justify-between border-b border-border/50 pb-3 mb-4">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-gold animate-pulse"></span>
-                    <span className="text-xs font-mono text-muted-foreground">Registro de Memória: Fase 1º Ano</span>
+                    <span className="text-xs font-mono text-muted-foreground">Registro: 14 de Outubro de 2026 às 16:30</span>
                   </div>
-                  <span className="text-[10px] bg-gold-soft/40 text-gold px-2.5 py-1 rounded-full font-medium">100% Personalizado</span>
+                  <span className="text-[10px] bg-gold-soft/40 text-gold px-2.5 py-1 rounded-full font-medium">Fase 1º Ano</span>
                 </div>
                 <p className="text-sm font-sans text-foreground/90 italic leading-relaxed">
                   "Hoje o Pedro deu os primeiros passinhos no meio da sala. Ficou sorrindo e correu direto para os meus braços. Um dia que nunca esqueceremos."
                 </p>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/30 font-medium">
-                  <span>📸 Foto anexada</span>
-                  <span>🎬 Link do Vídeo incluído</span>
+                  <span>📸 Foto do momento</span>
+                  <span>🎬 Clipe de 5s enviado da galeria</span>
                 </div>
               </div>
 
-              {/* Right Side: Digital Book / PDF Showcase */}
+              {/* Right Side: Baby First Steps Memory Page Showcase */}
               <div className="relative group">
-                <div className="rounded-2xl overflow-hidden border border-border shadow-lift relative">
+                <div className="rounded-2xl overflow-hidden border border-border shadow-lift relative bg-card">
                   <img 
-                    src="/book-mockup.jpg" 
-                    alt="Livro Digital e PDF Primeiros Capítulos" 
+                    src="/baby-first-steps.jpg" 
+                    alt="Bebê dando os primeiros passos na sala" 
                     className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105"
                   />
+                  <div className="absolute top-3 right-3 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border border-gold/40 shadow-sm flex items-center gap-1.5 text-xs text-foreground font-medium">
+                    <span>📅 14/10/2026 às 16:30</span>
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent flex items-end p-5">
                     <div>
-                      <span className="text-xs font-display text-gold">Acesso Digital & Arquivo PDF</span>
+                      <span className="text-xs font-display text-gold">Página Ilustrada do Livro Digital e PDF</span>
                       <h4 className="font-display text-xl text-foreground mt-0.5">"Os Primeiros Passos na Sala"</h4>
-                      <p className="text-[11px] text-muted-foreground mt-1">Leia na plataforma ou exporte o arquivo para imprimir.</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">Foto, relato e clipe curto de 5s salvos para sempre.</p>
                     </div>
                   </div>
                 </div>
@@ -153,7 +156,7 @@ function Landing() {
                 <div className="w-12 h-12 rounded-full bg-gold-soft flex items-center justify-center font-display text-2xl text-primary font-medium mb-5">1</div>
                 <h3 className="font-display text-2xl">Você registra o momento</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Escreva um relato sincero sobre um acontecimento marcante, anexe as melhores fotografias e inclua o link do vídeo de onde ele estiver armazenado na nuvem.
+                  Escreva um relato sincero sobre um acontecimento marcante, anexe fotografias especiais e suba um clipe de vídeo curto de até 5 segundos direto da sua galeria.
                 </p>
               </div>
 
@@ -220,8 +223,8 @@ function Landing() {
                   <li className="flex gap-4">
                     <span className="text-gold font-bold text-xl">✦</span>
                     <div>
-                      <h4 className="font-display text-xl">Vídeo integrado e acessível no PDF</h4>
-                      <p className="text-sm text-muted-foreground mt-1">O livro digital possui cinema de lembranças, e ao gerar o PDF, cada vídeo conta com um link para acesso em qualquer lugar.</p>
+                      <h4 className="font-display text-xl">Clipes curtos direto da sua galeria</h4>
+                      <p className="text-sm text-muted-foreground mt-1">Envie vídeos de até 5 segundos direto do seu aparelho, sem precisar de links externos. A própria plataforma gera o link para leitura no PDF.</p>
                     </div>
                   </li>
                   <li className="flex gap-4">
@@ -269,8 +272,8 @@ function Landing() {
                   a: "Com certeza. O nosso arquivo PDF já é entregue totalmente diagramado no formato de livro editorial de luxo. Basta salvar o arquivo e imprimir onde você preferir para ter a versão física nas mãos."
                 },
                 {
-                  q: "Como funcionam os vídeos na versão em PDF e na impressão?",
-                  a: "No livro digital online, você assiste aos vídeos diretamente na tela. Na versão em PDF ou impressa, criamos um quadro especial com o endereço (link) do vídeo em nuvem para que o leitor possa acessar facilmente através do computador ou celular."
+                  q: "Como funcionam os clipes de vídeo no livro e na versão impressa?",
+                  a: "Você envia um vídeo curto de até 5 segundos diretamente da galeria do seu celular ou computador, sem precisar colar links de nuvem. No livro digital online, o clipe toca na própria tela. Na versão em PDF ou impressa, a plataforma gera automaticamente o link e o quadro de acesso para que o leitor possa assistir pelo celular."
                 },
                 {
                   q: "Sou obrigado a usar números fixos como Capítulo 1 e Capítulo 2?",

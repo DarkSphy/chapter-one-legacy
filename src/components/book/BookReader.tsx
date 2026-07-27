@@ -71,6 +71,32 @@ function VideoPlayer({ path }: { path: string }) {
   return <video src={url} controls className="size-full max-h-[16rem] object-contain rounded-xl" />;
 }
 
+function PdfVideoLinkBox({ urlPath }: { urlPath: string }) {
+  const isHttp = urlPath.startsWith("http");
+  const signed = useSignedUrl(isHttp ? null : urlPath);
+  const displayUrl = isHttp ? urlPath : (signed || "https://primeiroscapitulos.app/video-ativo");
+
+  return (
+    <div className="rounded-2xl border border-gold/50 bg-gold-soft/20 p-4 text-center shadow-sm">
+      <p className="text-[11px] font-bold tracking-wider text-gold uppercase mb-1 flex items-center justify-center gap-1.5">
+        <ExternalLink className="size-3" />
+        <span>Link para Acesso no Livro em PDF</span>
+      </p>
+      <p className="text-xs text-muted-foreground mb-2.5">
+        Ao exportar em PDF ou ler o livro impresso, acesse o vídeo diretamente pelo link da plataforma:
+      </p>
+      <a
+        href={displayUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center justify-center font-mono text-xs text-foreground bg-background/90 px-3 py-2 rounded-xl border border-border hover:border-gold transition-all duration-200 break-all underline decoration-gold shadow-xs w-full font-medium"
+      >
+        {displayUrl}
+      </a>
+    </div>
+  );
+}
+
 function PageFace({ page, number }: { page: Page; number: number }) {
   const updateStory = useUpdateStory();
   const [isEditing, setIsEditing] = useState(false);
@@ -222,23 +248,7 @@ function PageFace({ page, number }: { page: Page; number: number }) {
             )}
           </div>
 
-          <div className="rounded-2xl border border-gold/50 bg-gold-soft/20 p-4 text-center shadow-sm">
-            <p className="text-[11px] font-bold tracking-wider text-gold uppercase mb-1 flex items-center justify-center gap-1.5">
-              <ExternalLink className="size-3" />
-              <span>Link para Acesso no Livro em PDF</span>
-            </p>
-            <p className="text-xs text-muted-foreground mb-2.5">
-              Ao exportar em PDF ou ler o livro impresso, acesse o vídeo diretamente pelo link:
-            </p>
-            <a
-              href={page.video.url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center font-mono text-xs text-foreground bg-background/90 px-3 py-2 rounded-xl border border-border hover:border-gold transition-all duration-200 break-all underline decoration-gold shadow-xs w-full font-medium"
-            >
-              {page.video.url}
-            </a>
-          </div>
+          <PdfVideoLinkBox urlPath={page.video.url} />
         </div>
       )}
 

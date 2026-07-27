@@ -57,7 +57,6 @@ export function MomentDialog({ open, onOpenChange }: Props) {
   
   const [files, setFiles] = useState<{ file: File; preview: string }[]>([]);
   const [videoFiles, setVideoFiles] = useState<{ file: File; preview: string }[]>([]);
-  const [videoLink, setVideoLink] = useState("");
 
   const [writing, setWriting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -80,7 +79,6 @@ export function MomentDialog({ open, onOpenChange }: Props) {
     setFiles([]);
     videoFiles.forEach((f) => URL.revokeObjectURL(f.preview));
     setVideoFiles([]);
-    setVideoLink("");
   }
 
   async function handleWrite() {
@@ -158,13 +156,6 @@ export function MomentDialog({ open, onOpenChange }: Props) {
         uploaded.push({
           url: path,
           media_type: "video",
-        });
-      }
-
-      if (videoLink.trim()) {
-        uploaded.push({
-          url: videoLink.trim(),
-          media_type: "video_link",
         });
       }
 
@@ -440,41 +431,25 @@ export function MomentDialog({ open, onOpenChange }: Props) {
               )}
             </div>
 
-            {/* Vídeos e Links para PDF */}
+            {/* Vídeos (Até 5 segundos) */}
             <div className="space-y-3 rounded-2xl border border-gold/30 bg-gold-soft/10 p-5">
               <div className="flex items-center justify-between">
                 <Label className="flex items-center gap-2 text-base font-medium text-foreground">
                   <Video className="size-4 text-gold" />
-                  <span>Vídeo da Lembrança (Separado da foto)</span>
+                  <span>Vídeo Curto (Até 5 segundos)</span>
                 </Label>
-                <span className="text-[10px] tracking-wider uppercase font-semibold bg-gold/20 text-gold px-2 py-0.5 rounded-full">
-                  Link ativo no PDF
+                <span className="text-[10px] tracking-wider uppercase font-semibold bg-gold/20 text-gold px-2.5 py-0.5 rounded-full">
+                  Link gerado no PDF
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Adicione um vídeo ou cole o link (Drive, YouTube, iCloud) para assistir ao clicar no livro e ao exportar em PDF.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Suba um clipe curto (estilo Live Photo ou micro-vídeo de até 5 segundos) direto do seu aparelho. A própria plataforma armazena o arquivo e gera automaticamente o link para acesso no PDF.
               </p>
 
               <div className="space-y-3 pt-2">
-                <div className="relative">
-                  <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <Input
-                    value={videoLink}
-                    onChange={(e) => setVideoLink(e.target.value)}
-                    placeholder="Cole o link do vídeo (https://youtu.be/... ou Google Drive)"
-                    className="pl-10 rounded-xl bg-background border-border text-sm"
-                  />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="h-px bg-border/60 flex-1" />
-                  <span className="text-[11px] text-muted-foreground uppercase font-mono">ou suba o arquivo</span>
-                  <div className="h-px bg-border/60 flex-1" />
-                </div>
-
-                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background/80 px-4 py-3.5 text-xs text-muted-foreground transition-colors hover:border-gold/60">
-                  <Video className="size-3.5" strokeWidth={1.5} />
-                  <span>Anexar arquivo de vídeo (.mp4, .mov)</span>
+                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background/80 px-4 py-4 text-xs text-muted-foreground transition-colors hover:border-gold/60 font-medium">
+                  <Video className="size-4 text-gold" strokeWidth={1.5} />
+                  <span>Anexar vídeo da galeria (.mp4, .mov, até 5s)</span>
                   <input
                     type="file"
                     accept="video/*"
@@ -482,6 +457,17 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                     className="hidden"
                     onChange={(e) => {
                       const list = Array.from(e.target.files ?? []);
+                      for (const file of list) {
+                        const vid = document.createElement("video");
+                        vid.preload = "metadata";
+                        vid.onloadedmetadata = function () {
+                          window.URL.revokeObjectURL(vid.src);
+                          if (vid.duration > 5.5) {
+                            toast.warning("O vídeo selecionado tem mais de 5 segundos. Para manter o livro leve e dinâmico, por favor escolha clipes de até 5 segundos!");
+                          }
+                        };
+                        vid.src = URL.createObjectURL(file);
+                      }
                       setVideoFiles((prev) => [
                         ...prev,
                         ...list.map((file) => ({ file, preview: URL.createObjectURL(file) })),
@@ -492,8 +478,9 @@ export function MomentDialog({ open, onOpenChange }: Props) {
                 {videoFiles.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-1">
                     {videoFiles.map((f, i) => (
-                      <div key={i} className="relative size-20 overflow-hidden rounded-xl border bg-black">
+                      <div key={i} className="relative size-20 overflow-hidden rounded-xl border bg-black shadow-sm">
                         <video src={f.preview} className="size-full object-cover" />
+                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">≤5s</span>
                         <button
                           type="button"
                           onClick={() => setVideoFiles((prev) => prev.filter((_, idx) => idx !== i))}
