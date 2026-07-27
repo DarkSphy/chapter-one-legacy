@@ -115,3 +115,39 @@ export async function signUrl(path: string): Promise<string | null> {
   if (error) return null;
   return data?.signedUrl ?? null;
 }
+
+export async function fetchCustomChapters() {
+  const { data, error } = await supabase
+    .from("chapters")
+    .select("*")
+    .order("position", { ascending: true });
+  if (error || !data) return [];
+  return data.map((row, idx) => ({
+    slug: row.slug,
+    index: row.position || 10 + idx,
+    title: row.title,
+    subtitle: row.subtitle || "Um capítulo especial da nossa história.",
+  }));
+}
+
+export async function upsertCustomChapter(slug: string, title: string, subtitle?: string) {
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id;
+  if (!userId) return;
+
+  try {
+    await supabase.from("chapters").upsert(
+      {
+        slug,
+        title,
+        subtitle: subtitle || "Um capítulo especial da nossa história.",
+        user_id: userId,
+        position: Date.now() % 1000000,
+      },
+      { onConflict: "slug" },
+    );
+  } catch (err) {
+    console.error("Failed to save custom chapter to db:", err);
+  }
+}
+

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit3, Check, Loader2, Sparkles, Video, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { MomentCover } from "@/components/moments/MomentCard";
-import { CHAPTERS } from "@/lib/chapters";
+import { CHAPTERS, getAllChapters, type ChapterDef } from "@/lib/chapters";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useUpdateStory } from "@/hooks/useLibrary";
+import { useUpdateStory, useSignedUrl } from "@/hooks/useLibrary";
 import type { Moment } from "@/types";
 
 type Page =
@@ -14,9 +14,10 @@ type Page =
   | { kind: "chapter"; index: number; title: string; subtitle: string }
   | { kind: "moment"; moment: Moment }
   | { kind: "photo"; moment: Moment }
+  | { kind: "video"; moment: Moment; video: { url: string; media_type: string } }
   | { kind: "end" };
 
-export function buildPages(moments: Moment[], childName: string): Page[] {
+export function buildPages(moments: Moment[], childName: string, customChapters?: ChapterDef[]): Page[] {
   const pages: Page[] = [
     {
       kind: "cover",
@@ -25,7 +26,9 @@ export function buildPages(moments: Moment[], childName: string): Page[] {
     },
   ];
 
-  for (const chapter of CHAPTERS) {
+  const allChapters = getAllChapters(moments, customChapters);
+
+  for (const chapter of allChapters) {
     const items = moments
       .filter((m) => m.chapter_slug === chapter.slug)
       .sort((a, b) => a.happened_on.localeCompare(b.happened_on));
@@ -38,12 +41,34 @@ export function buildPages(moments: Moment[], childName: string): Page[] {
     });
     for (const moment of items) {
       pages.push({ kind: "moment", moment });
-      pages.push({ kind: "photo", moment });
+      
+      const photos = moment.moment_media?.filter((m) => m.media_type === "photo") || [];
+      const videos = moment.moment_media?.filter((m) => m.media_type === "video" || m.media_type === "video_link" || m.url.includes("youtu") || m.url.includes("drive.google") || m.url.includes(".mp4") || m.url.includes(".mov")) || [];
+
+      if (photos.length > 0 || moment.cover_url || videos.length === 0) {
+        pages.push({ kind: "photo", moment });
+      }
+
+      for (const vid of videos) {
+        pages.push({ kind: "video", moment, video: vid });
+      }
     }
   }
 
   if (pages.length > 1) pages.push({ kind: "end" });
   return pages;
+}
+
+function VideoPlayer({ path }: { path: string }) {
+  const url = useSignedUrl(path);
+  if (!url) {
+    return (
+      <div className="flex items-center justify-center p-8 text-muted-foreground">
+        <Loader2 className="size-6 animate-spin text-gold" />
+      </div>
+    );
+  }
+  return <video src={url} controls className="size-full max-h-[16rem] object-contain rounded-xl" />;
 }
 
 function PageFace({ page, number }: { page: Page; number: number }) {
@@ -158,6 +183,61 @@ function PageFace({ page, number }: { page: Page; number: number }) {
             {page.moment.title}
           </figcaption>
         </figure>
+      )}
+
+      {page.kind === "video" && (
+        <div className="flex flex-col h-full justify-between space-y-4 my-auto">
+          <div className="space-y-1 text-center">
+            <p className="label-eyebrow flex items-center justify-center gap-1.5 text-gold font-semibold">
+              <Video className="size-3.5" />
+              <span>Cinema da Lembrança · {page.moment.title}</span>
+            </p>
+            <h3 className="font-display text-2xl font-light">O filme desse momento</h3>
+          </div>
+
+          <div className="relative overflow-hidden rounded-2xl border border-gold/40 bg-black/95 shadow-md flex-1 min-h-[14rem] flex flex-col items-center justify-center p-4">
+            {page.video.media_type === "video_link" || page.video.url.startsWith("http") ? (
+              page.video.url.includes("youtu") || page.video.url.endsWith(".mp4") ? (
+                <video src={page.video.url} controls className="size-full max-h-[16rem] object-contain rounded-xl" />
+              ) : (
+                <div className="text-center space-y-3 p-4">
+                  <div className="size-14 rounded-full bg-gold/20 text-gold flex items-center justify-center mx-auto border border-gold/40 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                    <Video className="size-7" />
+                  </div>
+                  <p className="font-display text-lg text-white">Vídeo na Nuvem (Drive / iCloud)</p>
+                  <a
+                    href={page.video.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2 text-sm font-medium text-foreground hover:bg-gold-soft transition-transform hover:scale-105"
+                  >
+                    <span>▶️ Assistir Vídeo Externo</span>
+                  </a>
+                </div>
+              )
+            ) : (
+              <VideoPlayer path={page.video.url} />
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-gold/50 bg-gold-soft/20 p-4 text-center shadow-sm">
+            <p className="text-[11px] font-bold tracking-wider text-gold uppercase mb-1 flex items-center justify-center gap-1.5">
+              <ExternalLink className="size-3" />
+              <span>Link para Acesso no Livro em PDF</span>
+            </p>
+            <p className="text-xs text-muted-foreground mb-2.5">
+              Ao exportar em PDF ou ler o livro impresso, acesse o vídeo diretamente pelo link:
+            </p>
+            <a
+              href={page.video.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center font-mono text-xs text-foreground bg-background/90 px-3 py-2 rounded-xl border border-border hover:border-gold transition-all duration-200 break-all underline decoration-gold shadow-xs w-full font-medium"
+            >
+              {page.video.url}
+            </a>
+          </div>
+        </div>
       )}
 
       {page.kind === "end" && (

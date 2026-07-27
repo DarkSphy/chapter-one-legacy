@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { BookReader, buildPages } from "@/components/book/BookReader";
-import { useChild, useMoments } from "@/hooks/useLibrary";
+import { useChild, useMoments, useCustomChapters } from "@/hooks/useLibrary";
 
 export const Route = createFileRoute("/_authenticated/livro")({
   head: () => ({
@@ -23,8 +23,9 @@ export const Route = createFileRoute("/_authenticated/livro")({
 
 function Livro() {
   const { data: child } = useChild();
+  const { data: dbChapters } = useCustomChapters();
   const { data: moments = [], isLoading } = useMoments();
-  const pages = useMemo(() => buildPages(moments, child?.name ?? ""), [moments, child]);
+  const pages = useMemo(() => buildPages(moments, child?.name ?? "", dbChapters), [moments, child, dbChapters]);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-14 sm:py-20">

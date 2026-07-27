@@ -30,9 +30,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 sm:flex sm:justify-between">
-          <Link to="/inicio" className="flex min-w-0 items-center gap-2.5">
-            <BookOpen className="size-4 shrink-0 text-gold" strokeWidth={1.5} />
-            <span className="truncate font-display text-lg tracking-tight">
+          <Link to="/inicio" className="flex min-w-0 items-center gap-3 group">
+            <img src="/logo.png" alt="Primeiros Capítulos" className="size-7 rounded-full object-cover border border-gold/40 shadow-xs transition-transform duration-300 group-hover:scale-105" />
+            <span className="truncate font-display text-lg tracking-tight font-medium">
               Primeiros Capítulos
             </span>
           </Link>

@@ -44,8 +44,42 @@ export const CHAPTERS: ChapterDef[] = [
   },
 ];
 
-export const chapterBySlug = (slug: string) =>
-  CHAPTERS.find((c) => c.slug === slug) ?? CHAPTERS[0];
+export const chapterBySlug = (slug: string, customChapters?: ChapterDef[]) => {
+  const found =
+    customChapters?.find((c) => c.slug === slug) ??
+    CHAPTERS.find((c) => c.slug === slug);
+  if (found) return found;
+  // Dynamic fallback for custom chapters not in list
+  const formatTitle = slug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+  return {
+    slug,
+    index: 99,
+    title: formatTitle || "Capítulo Especial",
+    subtitle: "Um capítulo especial da nossa história.",
+  };
+};
+
+export function getAllChapters(
+  moments?: { chapter_slug: string }[],
+  customChapters?: ChapterDef[]
+): ChapterDef[] {
+  const map = new Map<string, ChapterDef>();
+  CHAPTERS.forEach((c) => map.set(c.slug, c));
+  customChapters?.forEach((c) => map.set(c.slug, c));
+
+  let nextIdx = CHAPTERS.length + 1;
+  moments?.forEach((m) => {
+    if (!map.has(m.chapter_slug)) {
+      const def = chapterBySlug(m.chapter_slug, customChapters);
+      def.index = nextIdx++;
+      map.set(m.chapter_slug, def);
+    }
+  });
+
+  return Array.from(map.values()).sort((a, b) => a.index - b.index);
+}
 
 export const FEELINGS = [
   { value: "feliz", label: "Feliz", emoji: "🤍" },
@@ -55,6 +89,13 @@ export const FEELINGS = [
   { value: "ansioso", label: "Ansioso", emoji: "🌿" },
   { value: "grato", label: "Grato", emoji: "🕊️" },
 ];
+
+export function getFeeling(value?: string | null) {
+  if (!value) return null;
+  const found = FEELINGS.find((f) => f.value === value);
+  if (found) return found;
+  return { value, label: value, emoji: "✨" };
+}
 
 export const CATEGORIES = [
   { value: "gestacao", label: "Gestação" },
@@ -66,5 +107,13 @@ export const CATEGORIES = [
   { value: "memoria", label: "Memória" },
 ];
 
-/** Cada momento vira aproximadamente 2 páginas do livro. */
+export function getCategoryLabel(value?: string | null) {
+  if (!value) return "";
+  const found = CATEGORIES.find((c) => c.value === value);
+  if (found) return found.label;
+  return value.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+/** Cada momento vira aproximadamente 2 páginas do livro (ou 3 se tiver vídeo). */
 export const pagesFromMoments = (count: number) => (count === 0 ? 0 : count * 2);
+

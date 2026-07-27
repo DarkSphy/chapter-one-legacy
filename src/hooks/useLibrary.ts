@@ -8,11 +8,16 @@ import {
   updateMomentStory,
   upsertChild,
   signUrl,
+  fetchCustomChapters,
 } from "@/services/library";
 import type { Child, MomentInput } from "@/types";
 
 export function useChild() {
   return useQuery({ queryKey: ["child"], queryFn: fetchChild });
+}
+
+export function useCustomChapters() {
+  return useQuery({ queryKey: ["chapters"], queryFn: fetchCustomChapters });
 }
 
 export function useSaveChild() {
@@ -31,7 +36,10 @@ export function useCreateMoment(childId: string | null) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: MomentInput) => createMoment(input, childId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["moments"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["moments"] });
+      qc.invalidateQueries({ queryKey: ["chapters"] });
+    },
   });
 }
 
@@ -69,3 +77,4 @@ export function useSignedUrl(path?: string | null) {
   }, [path]);
   return url;
 }
+

@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MomentCover } from "@/components/moments/MomentCard";
-import { FEELINGS, chapterBySlug } from "@/lib/chapters";
+import { getFeeling, chapterBySlug } from "@/lib/chapters";
 import type { Moment } from "@/types";
 
 export function Timeline({ moments }: { moments: Moment[] }) {
@@ -12,7 +12,7 @@ export function Timeline({ moments }: { moments: Moment[] }) {
         className="absolute top-2 bottom-2 left-[11px] w-px origin-top animate-[var(--animate-draw)] bg-gradient-to-b from-gold/70 via-border to-transparent sm:left-1/2"
       />
       {moments.map((moment, i) => {
-        const feeling = FEELINGS.find((f) => f.value === moment.feeling);
+        const feeling = getFeeling(moment.feeling);
         const left = i % 2 === 0;
         return (
           <li

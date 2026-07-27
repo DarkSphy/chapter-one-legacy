@@ -4,7 +4,7 @@ import { ArrowUpRight, Image as ImageIcon, Trash2, Loader2 } from "lucide-react"
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSignedUrl, useDeleteMoment } from "@/hooks/useLibrary";
-import { FEELINGS, chapterBySlug } from "@/lib/chapters";
+import { getFeeling, chapterBySlug } from "@/lib/chapters";
 import type { Moment } from "@/types";
 
 export function MomentCover({
@@ -28,7 +28,7 @@ export function MomentCover({
 }
 
 export function MomentCard({ moment, onOpen }: { moment: Moment; onOpen?: () => void }) {
-  const feeling = FEELINGS.find((f) => f.value === moment.feeling);
+  const feeling = getFeeling(moment.feeling);
   const chapter = chapterBySlug(moment.chapter_slug);
   const deleteMoment = useDeleteMoment();
   const [isDeleting, setIsDeleting] = useState(false);
